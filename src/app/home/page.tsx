@@ -136,10 +136,6 @@ export default async function Home() {
           </div>
         </aside>
       </main>
-
-      <footer className="mt-10 text-center text-xs text-gray-400 pb-8">
-        Built with Tailwind + Framer Motion
-      </footer>
     </div>
   );
 }

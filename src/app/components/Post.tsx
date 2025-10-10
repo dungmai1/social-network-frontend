@@ -4,17 +4,31 @@ import { useEffect, useState } from "react";
 import { PostModel } from "../types/post";
 import { formatDate } from "../(libs)/date";
 import { getAllPost } from "../services/post.service";
+import { getLike } from "../services/like.service";
 
+type Like = {
+  likeCount: number;
+  liked: boolean;
+};
 export default function Post() {
   const [postLists, setPostLists] = useState<PostModel[]>([]);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [like, setLike] = useState<Like>();
+  const handleLikeToggle = async (postId: number) => {
+    const res = await getLike(postId);
+    if (res) {
+      setLike(res);
+      setIsLiked(res.liked);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDataPost = async () => {
       const data = await getAllPost();
       if (data) {
         setPostLists(data);
       }
     };
-    fetchData();
+    fetchDataPost();
   }, []);
   return (
     <div>
@@ -47,8 +61,14 @@ export default function Post() {
 
           <div className="p-3">
             <div className="flex items-center gap-3">
-              <button className="p-2 rounded-md hover:bg-gray-100">
-                <Heart />
+              <button
+                onClick={() => handleLikeToggle(post.id)}
+                className="p-2 rounded-md hover:bg-gray-100"
+              >
+                <Heart
+                  fill={isLiked ? "red" : "none"}
+                  stroke={isLiked ? "red" : "black"}
+                />
               </button>
               <button className="p-2 rounded-md hover:bg-gray-100">
                 <MessageCircle />
