@@ -12,12 +12,10 @@ export async function login(username: string, password: string) {
         throw new Error("Invalid credentials");
     }else{
         const data = await res.json();
-        localStorage.setItem("accessToken", data.accessToken);
-        window.location.href = "/"
+        window.location.href = "/home"
         return data;
     }
 }
 
 export async function logout() {
-  localStorage.removeItem("accessToken");
 }

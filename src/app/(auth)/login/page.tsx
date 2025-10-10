@@ -25,6 +25,9 @@ export default function LoginPage() {
       console.log("Lỗi đăng nhập:", e);
     }
   };
+  const handleLoginGoogle = () =>{
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  }
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#FFFCFC]">
       <div className="text-center mr-20">
@@ -80,7 +83,7 @@ export default function LoginPage() {
         <div className="flex justify-center space-x-3 mt-3">
           <button
             className="w-full bg-red-500 text-white py-2 rounded-md font-bold"
-            onClick={methods.handleSubmit(onSubmit)}
+            onClick={()=>handleLoginGoogle()}
           >
             Login with Google
           </button>

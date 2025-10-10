@@ -4,13 +4,11 @@ export async function apiFetch(
   options: RequestInit = {},
   autoRetry = true
 ): Promise<Response> {
-    const token = localStorage.getItem("accessToken");
     const res = await fetch(`${API_BASE_AUTH}${endpoint}`, {
         ...options,
         credentials: "include",
         headers:{
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
             ...options.headers
         }
     });
@@ -20,12 +18,9 @@ export async function apiFetch(
             credentials: "include",
         });
         if (refreshRes.ok){
-            const data = await refreshRes.json();
-            localStorage.setItem("accessToken", data.accessToken);
             return apiFetch(endpoint,options,false);
         }else{
-            localStorage.removeItem("accessToken");
-            window.location.href = "/";
+            
         }
     }
     return res;
