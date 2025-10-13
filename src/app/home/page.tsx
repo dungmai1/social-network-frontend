@@ -1,12 +1,11 @@
-import React from "react";
-import {
-  Heart,
-  MessageCircle,
-  Search,
-  Clapperboard,
-} from "lucide-react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Heart, MessageCircle, Search, Clapperboard } from "lucide-react";
 import Avatar from "../components/Avatar";
 import Post from "../components/Post";
+import { PostModel } from "../types/post";
+import { getAllPost } from "../services/post.service";
 
 function Header() {
   return (
@@ -54,7 +53,17 @@ function Story({ name }: any) {
   );
 }
 
-export default async function Home() {
+export default function Home() {
+  const [postLists, setPostLists] = useState<PostModel[]>([]);
+  const fetchDataPost = async () => {
+    const data = await getAllPost();
+    if (data) {
+      setPostLists(data);
+    }
+  };
+  useEffect(() => {
+    fetchDataPost();
+  }, []);
   const stories = [
     "you",
     "alice",
@@ -99,7 +108,9 @@ export default async function Home() {
             </div>
           </div>
           <div className="space-y-6">
-            <Post />
+            {postLists.map((post) => (
+              <Post post={post} />
+            ))}
           </div>
         </section>
         {/* SIDEBAR RIGHT */}
@@ -108,8 +119,12 @@ export default async function Home() {
             <Avatar />
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between mb-3">
-                <div className="text-sm text-gray-600 font-medium">Suggested for you</div>
-                <button className="text-xs text-gray-500 hover:text-gray-700">See All</button>
+                <div className="text-sm text-gray-600 font-medium">
+                  Suggested for you
+                </div>
+                <button className="text-xs text-gray-500 hover:text-gray-700">
+                  See All
+                </button>
               </div>
               <ul className="space-y-3">
                 {["anna", "brian", "carl"].map((s) => (
@@ -121,11 +136,15 @@ export default async function Home() {
                         alt={s}
                       />
                       <div>
-                        <div className="text-sm font-medium text-gray-800">{s}</div>
+                        <div className="text-sm font-medium text-gray-800">
+                          {s}
+                        </div>
                         <div className="text-xs text-gray-500">Suggested</div>
                       </div>
                     </div>
-                    <button className="text-xs text-blue-600 hover:text-blue-800 font-medium">Follow</button>
+                    <button className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                      Follow
+                    </button>
                   </li>
                 ))}
               </ul>

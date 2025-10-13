@@ -7,6 +7,4 @@ export interface PostModel {
   avatar: string;
   status: string;
   imageUrl: string;
-  likeCount: number;
-  commentCount: number;
 }
