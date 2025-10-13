@@ -18,4 +18,12 @@ export async function login(username: string, password: string) {
 }
 
 export async function logout() {
+    const res = await apiFetch(`/api/v1/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+    })
+    if(!res.ok){
+        throw new Error("Failed to logout");
+    }
+    window.location.href = "/login";
 }

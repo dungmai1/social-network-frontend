@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { getUser } from "../services/user.service";
 import { UserModel } from "../types/user";
+import { logout } from "../api/auth/routes";
 
 export default function Avatar() {
     const [user, setUser] = useState<UserModel | null>(null);
+    
     useEffect(() => {
       const fetchData = async () => {
         const data = await getUser();
@@ -14,18 +16,28 @@ export default function Avatar() {
       };
       fetchData();
     }, []);
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
-    <div className="bg-white p-3 rounded-md">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="font-semibold">{user?.username}</div>
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="flex items-center gap-3">
+        <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-200">
+          <img
+            className="w-full h-full object-cover"
+            src={user?.avatar}
+            alt={user?.username || "User"}
+          />
+        </div>
+        <div className="flex-1">
+          <div className="font-semibold text-gray-900 text-sm">{user?.username}</div>
           <div className="text-xs text-gray-500">{user?.displayname}</div>
         </div>
-        <img
-          className="w-12 h-12 rounded-full"
-          src={user?.avatar}
-          alt="me"
-        /> 
+        <button onClick={handleLogout} className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+          Log out
+        </button>
       </div>
     </div>
   );
