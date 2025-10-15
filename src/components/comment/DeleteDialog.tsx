@@ -12,18 +12,7 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-export default function DeleteDialog({ postId, commentId }: { postId: number, commentId: number }) {
-    const handleDeleteComment = async () => {
-        try {
-            // const res = await deleteComment(postId, commentId);
-            // if(!res.ok) return;
-            console.log("postId", postId);
-            console.log("commentId", commentId);
-            alert("success");
-        } catch (error) {
-            console.log("Error delete comment")
-        }
-    }
+export default function DeleteDialog({ postId, commentId, onDelete }: { postId: number, commentId: number, onDelete: (postId: number, commentId: number) => void }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -43,7 +32,7 @@ export default function DeleteDialog({ postId, commentId }: { postId: number, co
                         <button
                             type="button"
                             className="py-3 text-red-500 hover:bg-gray-50"
-                            onClick={() => handleDeleteComment()}
+                            onClick={() => onDelete(postId, commentId)}
                         >
                             Delete
                         </button>

@@ -1,10 +1,13 @@
 import { formatDate } from "@/lib/date";
 import DeleteDialog from "@/components/comment/DeleteDialog";
+import { useCommentActions } from "@/hooks/CommentActionsContext";
 import RepliesComments from "./RepliesComments";
 import { CommentModel } from "@/types/comment";
 import { Heart } from "lucide-react";
+import { useComment } from "@/hooks/useComment";
 
 export default function Comment({ comment, onReply }: { comment: CommentModel, onReply: (username: string) => void }) {
+    const { handleDeleteComment } = useCommentActions();
     return (
         <div>
             <div className="flex gap-3">
@@ -52,11 +55,14 @@ export default function Comment({ comment, onReply }: { comment: CommentModel, o
                             Reply
                         </div>
                         <DeleteDialog postId={comment.postId}
-                            commentId={comment.id} />
+                            commentId={comment.id}
+                            onDelete={handleDeleteComment}
+                        />
                     </div>
                 </div>
             </div>
             <RepliesComments
+                key={comment.id}
                 commentId={comment.id}
                 onReply={onReply}
             />

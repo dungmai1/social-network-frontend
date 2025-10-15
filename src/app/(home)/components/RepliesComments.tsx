@@ -80,7 +80,7 @@ export default function RepliesComments({ commentId, onReply }: { commentId: num
                                                 <div className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer" onClick={() => onReply(replies.userDisplayname)}>
                                                     Reply
                                                 </div>
-                                                <DeleteDialog postId={replies.postId} commentId={replies.id} />
+                                                {/* <DeleteDialog postId={replies.postId} commentId={replies.id} /> */}
                                             </div>
                                         </div>
                                     </div>

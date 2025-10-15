@@ -12,7 +12,7 @@ export async function login(username: string, password: string) {
         throw new Error("Invalid credentials");
     } else {
         const data = await res.json();
-        window.location.href = "/home"
+        window.location.href = "/"
         return data;
     }
 }

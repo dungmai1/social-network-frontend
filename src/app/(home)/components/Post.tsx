@@ -1,131 +1,15 @@
 "use client";
 import { Heart, MessageCircle, Send, MoreHorizontal } from "lucide-react";
-import { useEffect, useState } from "react";
 import { PostModel } from "../../../types/post";
-import { CommentModel } from "../../../types/comment";
 import { formatDate } from "../../../lib/date";
-import { addLike, getLikePost } from "../../../services/like.service";
-import {
-  addComment,
-  addReplies,
-  deleteComment,
-  getAllComment,
-  getCountComments,
-  getCountRepliesComments,
-} from "../../../services/comment.service";
-import RepliesComments from "./RepliesComments";
-import DeleteDialog from "@/components/comment/DeleteDialog";
 import Comment from "./Comment";
-
+import { useLike } from "@/hooks/useLike";
+import { useComment } from "@/hooks/useComment";
+import { CommentActionsProvider } from "@/hooks/CommentActionsContext";
 
 export default function Post({ post }: { post: PostModel }) {
-  const [isLiked, setIsLiked] = useState<{ [key: number]: boolean }>({});
-  const [commentInput, setCommentInput] = useState("");
-  const [likeCount, setLikeCount] = useState<{ [key: number]: number }>({});
-  const [showComments, setShowComments] = useState<{ [key: number]: boolean }>(
-    {}
-  );
-  const [comments, setComments] = useState<{ [key: number]: CommentModel[] }>(
-    {}
-  );
-  const [commentCount, setCommentCount] = useState<{ [key: number]: number }>(
-    {}
-  );
-
-  const handleLikeToggle = async () => {
-    try {
-      const res = await getLikePost(post.id);
-      if (!res) return;
-      setLikeCount((prev) => ({
-        ...prev,
-        [post.id]: res.likeCount,
-      }));
-      setIsLiked((prev) => ({
-        ...prev,
-        [post.id]: res.liked,
-      }));
-    } catch (error) {
-      console.error("Error toggling like:", error);
-    }
-  };
-  const handleShowComment = () => {
-    const postId = post.id;
-    setShowComments((prev) => ({
-      ...prev,
-      [postId]: !prev[postId],
-    }));
-    handleGetComments(postId);
-  };
-  const handleGetComments = async (postId: number) => {
-    const res = await getAllComment(postId);
-    setComments((prev) => ({
-      ...prev,
-      [postId]: res ?? [],
-    }));
-  };
-  const handleCountComment = async () => {
-    const res = await getCountComments(post.id);
-    setCommentCount((prev) => ({
-      ...prev,
-      [post.id]: res,
-    }));
-  };
-  const handleClickLike = async (postId: number) => {
-    try {
-      const res = await addLike("postId", postId, "post");
-      if (res) {
-        setIsLiked((prev) => ({
-          ...prev,
-          [postId]: !prev[postId],
-        }));
-        setLikeCount((prev) => ({
-          ...prev,
-          [postId]: prev[postId] + (isLiked[postId] ? -1 : 1),
-        }));
-      }
-    } catch (error) {
-      console.log("Error click like");
-    }
-  };
-  const handleClickReply = (userNameReply: string) => {
-    setCommentInput(`@${userNameReply} `);
-  };
-  const handleAddLikeComment = async (commentId: number) => {
-    try {
-      const res = await addLike("commentId", commentId, "comment");
-      if (res.ok) {
-        setIsLiked((prev) => ({
-          ...prev,
-          [commentId]: !prev[commentId],
-        }));
-      }
-    } catch (error) {
-      console.log("Error add like comment");
-    }
-  };
-  const handleAddComment = async (postId: number, content: string) => {
-    try {
-      const commentRequest = { postId, contentCmt: content };
-      const res = await addComment(commentRequest);
-      if (!res) return;
-      const newComments = Array.isArray(res) ? res : [res];
-      setComments((prev) => ({
-        ...prev,
-        [postId]: [...(prev[postId] || []), ...newComments],
-      }));
-      setCommentInput("");
-      setCommentCount((prev) => ({
-        ...prev,
-        [postId]: prev[postId] + 1,
-      }));
-    } catch (error) {
-      console.log("Error add comment");
-    }
-  };
-  useEffect(() => {
-    handleLikeToggle();
-    handleCountComment();
-  }, []);
+  const { isLiked, likeCount, handleClickLike } = useLike(post);
+  const { showComments, comments, commentCount, commentInput, handleShowComment, handleClickReply, handleAddComment, handleDeleteComment, setCommentInput } = useComment(post);
   return (
     <div className="space-y-6">
       <article className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
@@ -173,8 +57,8 @@ export default function Post({ post }: { post: PostModel }) {
             >
               <Heart
                 size={22}
-                fill={isLiked[post.id] ? "#ef4444" : "none"}
-                stroke={isLiked[post.id] ? "#ef4444" : "#374151"}
+                fill={isLiked ? "#ef4444" : "none"}
+                stroke={isLiked ? "#ef4444" : "#374151"}
                 className="transition-colors"
               />
             </button>
@@ -191,7 +75,7 @@ export default function Post({ post }: { post: PostModel }) {
 
           {/* Likes */}
           <div className="text-sm font-semibold text-gray-900 mb-2">
-            {likeCount[post.id]} likes
+            {likeCount} likes
           </div>
 
           {/* Caption */}
@@ -210,19 +94,21 @@ export default function Post({ post }: { post: PostModel }) {
             className="text-xs text-gray-500 mb-3 cursor-pointer hover:text-gray-700 transition"
             onClick={() => handleShowComment()}
           >
-            {showComments[post.id]
+            {showComments
               ? "Hide comments"
-              : commentCount[post.id] == 0
+              : commentCount == 0
                 ? ""
-                : `View all ${commentCount[post.id]} comments`}
+                : `View all ${commentCount} comments`}
           </div>
 
-          {showComments[post.id] && comments[post.id] && (
-            <div className="space-y-3 mb-3">
-              {comments[post.id].map((comment) => (
-                <Comment key={comment.id} comment={comment} onReply={handleClickReply} />
-              ))}
-            </div>
+          {showComments && comments && (
+            <CommentActionsProvider value={{ handleDeleteComment }}>
+              <div className="space-y-3 mb-3">
+                {comments.map((comment) => (
+                  <Comment key={comment.id} comment={comment} onReply={handleClickReply} />
+                ))}
+              </div>
+            </CommentActionsProvider>
           )}
           {/* Add Comment */}
           <div className="border-t border-gray-100 pt-3">

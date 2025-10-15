@@ -19,8 +19,8 @@ export async function getAllComment(postId: number) {
     console.error("Error fetch Post");
     return;
   }
-  const data: CommentModel[] = await res.json();
-  return data;
+  const comments: CommentModel[] = await res.json();
+  return comments;
 }
 
 export async function getCountComments(postId: number) {
@@ -29,8 +29,8 @@ export async function getCountComments(postId: number) {
     console.error("Error fetch Post");
     return;
   }
-  const count = await res.json();
-  return count;
+  const countComment = await res.json();
+  return countComment;
 }
 
 export async function addComment(commentRequest: CommentRequest) {
@@ -49,8 +49,8 @@ export async function getCountRepliesComments(commentId: number) {
     console.error("Error fetch Post");
     return;
   }
-  const count = await res.json();
-  return count;
+  const countReplies = await res.json();
+  return countReplies;
 }
 
 export async function getAllRepliesComments(commentId: number) {
@@ -59,8 +59,8 @@ export async function getAllRepliesComments(commentId: number) {
     console.error("Error fetch Post");
     return;
   }
-  const count = await res.json();
-  return count;
+  const replies = await res.json();
+  return replies;
 }
 
 export async function addReplies(repliesRequest: RepliesRequest) {
@@ -74,7 +74,7 @@ export async function addReplies(repliesRequest: RepliesRequest) {
 }
 
 export async function deleteComment(postId: number, commentId: number) {
-  const res = await apiFetch(`${URL_BASE}/delete?postId=${postId}?commentId=${commentId}`, { method: "DELETE" });
+  const res = await apiFetch(`${URL_BASE}/delete?postId=${postId}&commentId=${commentId}`, { method: "DELETE" });
   if (!res.ok) {
     console.error("Error fetch Post");
     return;

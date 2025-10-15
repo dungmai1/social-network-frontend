@@ -6,6 +6,7 @@ import Avatar from "./components/Avatar";
 import Post from "./components/Post";
 import { PostModel } from "../../types/post";
 import { getAllPost } from "../../services/post.service";
+import { usePost } from "@/hooks/usePost";
 
 function Header() {
   return (
@@ -54,16 +55,7 @@ function Story({ name }: any) {
 }
 
 export default function Home() {
-  const [postLists, setPostLists] = useState<PostModel[]>([]);
-  const fetchDataPost = async () => {
-    const data = await getAllPost();
-    if (data) {
-      setPostLists(data);
-    }
-  };
-  useEffect(() => {
-    fetchDataPost();
-  }, []);
+  const {postLists} = usePost();
   const stories = [
     "you",
     "alice",
