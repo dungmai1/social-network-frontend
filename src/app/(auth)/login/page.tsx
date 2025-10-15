@@ -1,5 +1,5 @@
 "use client";
-import { login } from "@/app/api/auth/routes";
+import { login } from "@/services/auth.service";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 

@@ -1,10 +1,10 @@
 "use client";
 import { Heart, MessageCircle, Send, MoreHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
-import { PostModel } from "../../types/post";
-import { CommentModel } from "../../types/comment";
-import { formatDate } from "../../(libs)/date";
-import { addLike, getLikePost } from "../../services/like.service";
+import { PostModel } from "../../../types/post";
+import { CommentModel } from "../../../types/comment";
+import { formatDate } from "../../../lib/date";
+import { addLike, getLikePost } from "../../../services/like.service";
 import {
   addComment,
   addReplies,
@@ -12,8 +12,8 @@ import {
   getAllComment,
   getCountComments,
   getCountRepliesComments,
-} from "../../services/comment.service";
-import RepliesComments from "./RepliesComment";
+} from "../../../services/comment.service";
+import RepliesComments from "./RepliesComments";
 import DeleteDialog from "@/components/comment/DeleteDialog";
 import Comment from "./Comment";
 
@@ -148,8 +148,6 @@ export default function Post({ post }: { post: PostModel }) {
           </div>
           <button
             className="p-1 rounded-full hover:bg-gray-100 transition"
-            title="More options"
-            aria-label="More options"
           >
             <MoreHorizontal size={20} className="text-gray-600" />
           </button>
@@ -222,7 +220,7 @@ export default function Post({ post }: { post: PostModel }) {
           {showComments[post.id] && comments[post.id] && (
             <div className="space-y-3 mb-3">
               {comments[post.id].map((comment) => (
-                  <Comment comment={comment} onReply={handleClickReply}/>
+                <Comment key={comment.id} comment={comment} onReply={handleClickReply} />
               ))}
             </div>
           )}

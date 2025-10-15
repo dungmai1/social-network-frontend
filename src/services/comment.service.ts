@@ -1,4 +1,4 @@
-import { apiFetch } from "../(libs)/api";
+import { apiFetch } from "../lib/api";
 import { CommentModel } from "../types/comment";
 
 const URL_BASE = "/comments"

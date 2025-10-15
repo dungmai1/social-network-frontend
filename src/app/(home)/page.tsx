@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Heart, MessageCircle, Search, Clapperboard } from "lucide-react";
 import Avatar from "./components/Avatar";
 import Post from "./components/Post";
-import { PostModel } from "../types/post";
-import { getAllPost } from "../services/post.service";
+import { PostModel } from "../../types/post";
+import { getAllPost } from "../../services/post.service";
 
 function Header() {
   return (
@@ -109,7 +109,7 @@ export default function Home() {
           </div>
           <div className="space-y-6">
             {postLists.map((post) => (
-              <Post post={post} />
+              <Post key={post.id} post={post} />
             ))}
           </div>
         </section>

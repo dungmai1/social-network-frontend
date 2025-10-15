@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { getAllRepliesComments, getCountRepliesComments } from "../../services/comment.service";
-import { CommentModel } from "../../types/comment";
+import { getAllRepliesComments, getCountRepliesComments } from "../../../services/comment.service";
+import { CommentModel } from "../../../types/comment";
 import { Heart } from "lucide-react";
-import { formatDate } from "../../(libs)/date";
+import { formatDate } from "../../../lib/date";
 import DeleteDialog from "@/components/comment/DeleteDialog";
 
 export default function RepliesComments({ commentId, onReply }: { commentId: number, onReply: (userName: string) => void; }) {
@@ -65,10 +65,12 @@ export default function RepliesComments({ commentId, onReply }: { commentId: num
                                                     <span className="text-gray-700">{replies.content}</span>
                                                 </div>
                                                 <div className="flex items-center">
-                                                    <Heart
-                                                        size={12}
-                                                        className="transition-colors"
-                                                    />
+                                                    <button>
+                                                        <Heart
+                                                            size={12}
+                                                            className="transition-colors"
+                                                        />
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div className="flex gap-5">

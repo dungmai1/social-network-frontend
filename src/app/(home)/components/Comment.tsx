@@ -1,7 +1,7 @@
-import { formatDate } from "@/app/(libs)/date";
+import { formatDate } from "@/lib/date";
 import DeleteDialog from "@/components/comment/DeleteDialog";
-import RepliesComments from "./RepliesComment";
-import { CommentModel } from "@/app/types/comment";
+import RepliesComments from "./RepliesComments";
+import { CommentModel } from "@/types/comment";
 import { Heart } from "lucide-react";
 
 export default function Comment({ comment, onReply }: { comment: CommentModel, onReply: (username: string) => void }) {
@@ -29,12 +29,14 @@ export default function Comment({ comment, onReply }: { comment: CommentModel, o
                             className="flex items-center"
                         // onClick={() => handleAddLikeComment(comment.id)}
                         >
-                            <Heart
-                                size={12}
-                                //   fill={isLiked[comment.id] ? "#ef4444" : "none"}
-                                //   stroke={isLiked[comment.id] ? "#ef4444" : "#374151"}
-                                className="transition-colors"
-                            />
+                            <button>
+                                <Heart
+                                    size={12}
+                                    //   fill={isLiked[comment.id] ? "#ef4444" : "none"}
+                                    //   stroke={isLiked[comment.id] ? "#ef4444" : "#374151"}
+                                    className="transition-colors"
+                                />
+                            </button>
                         </div>
                     </div>
                     <div className="flex gap-4">
