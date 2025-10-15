@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Heart, MessageCircle, Search, Clapperboard } from "lucide-react";
-import Avatar from "../components/Avatar";
-import Post from "../components/Post";
+import Avatar from "./components/Avatar";
+import Post from "./components/Post";
 import { PostModel } from "../types/post";
 import { getAllPost } from "../services/post.service";
 

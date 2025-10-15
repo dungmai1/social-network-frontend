@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { getAllRepliesComments, getCountRepliesComments } from "../services/comment.service";
-import { CommentModel } from "../types/comment";
+import { getAllRepliesComments, getCountRepliesComments } from "../../services/comment.service";
+import { CommentModel } from "../../types/comment";
 import { Heart } from "lucide-react";
-import { formatDate } from "../(libs)/date";
+import { formatDate } from "../../(libs)/date";
+import DeleteDialog from "@/components/comment/DeleteDialog";
 
 export default function RepliesComments({ commentId, onReply }: { commentId: number, onReply: (userName: string) => void; }) {
     const [repliesCount, setRepliesCount] = useState(0);
@@ -77,6 +78,7 @@ export default function RepliesComments({ commentId, onReply }: { commentId: num
                                                 <div className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer" onClick={() => onReply(replies.userDisplayname)}>
                                                     Reply
                                                 </div>
+                                                <DeleteDialog postId={replies.postId} commentId={replies.id} />
                                             </div>
                                         </div>
                                     </div>

@@ -1,15 +1,24 @@
 "use client";
 import { Heart, MessageCircle, Send, MoreHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
-import { PostModel } from "../types/post";
-import { CommentModel } from "../types/comment";
-import { formatDate } from "../(libs)/date";
-import { addLike, getLikePost } from "../services/like.service";
-import { addComment, addReplies, getAllComment, getCountComments, getCountRepliesComments } from "../services/comment.service";
+import { PostModel } from "../../types/post";
+import { CommentModel } from "../../types/comment";
+import { formatDate } from "../../(libs)/date";
+import { addLike, getLikePost } from "../../services/like.service";
+import {
+  addComment,
+  addReplies,
+  deleteComment,
+  getAllComment,
+  getCountComments,
+  getCountRepliesComments,
+} from "../../services/comment.service";
 import RepliesComments from "./RepliesComment";
+import DeleteDialog from "@/components/comment/DeleteDialog";
+import Comment from "./Comment";
+
 
 export default function Post({ post }: { post: PostModel }) {
-  const [openCommentMenuId, setOpenCommentMenuId] = useState<boolean>();
   const [isLiked, setIsLiked] = useState<{ [key: number]: boolean }>({});
   const [commentInput, setCommentInput] = useState("");
   const [likeCount, setLikeCount] = useState<{ [key: number]: number }>({});
@@ -19,7 +28,9 @@ export default function Post({ post }: { post: PostModel }) {
   const [comments, setComments] = useState<{ [key: number]: CommentModel[] }>(
     {}
   );
-  const [commentCount, setCommentCount] = useState<{ [key: number]: number }>({});
+  const [commentCount, setCommentCount] = useState<{ [key: number]: number }>(
+    {}
+  );
 
   const handleLikeToggle = async () => {
     try {
@@ -56,7 +67,7 @@ export default function Post({ post }: { post: PostModel }) {
     const res = await getCountComments(post.id);
     setCommentCount((prev) => ({
       ...prev,
-      [post.id]: res
+      [post.id]: res,
     }));
   };
   const handleClickLike = async (postId: number) => {
@@ -76,13 +87,12 @@ export default function Post({ post }: { post: PostModel }) {
       console.log("Error click like");
     }
   };
-  const handleClickReply = (userNameReply: String) => {
+  const handleClickReply = (userNameReply: string) => {
     setCommentInput(`@${userNameReply} `);
-  }
+  };
   const handleAddLikeComment = async (commentId: number) => {
     try {
-
-      const res = await addLike("commentId", commentId, "comment")
+      const res = await addLike("commentId", commentId, "comment");
       if (res.ok) {
         setIsLiked((prev) => ({
           ...prev,
@@ -90,9 +100,9 @@ export default function Post({ post }: { post: PostModel }) {
         }));
       }
     } catch (error) {
-      console.log("Error add like comment")
+      console.log("Error add like comment");
     }
-  }
+  };
   const handleAddComment = async (postId: number, content: string) => {
     try {
       const commentRequest = { postId, contentCmt: content };
@@ -106,15 +116,12 @@ export default function Post({ post }: { post: PostModel }) {
       setCommentInput("");
       setCommentCount((prev) => ({
         ...prev,
-        [postId]: prev[postId] + 1
-      }))
+        [postId]: prev[postId] + 1,
+      }));
     } catch (error) {
       console.log("Error add comment");
     }
   };
-  const handleOpenCommentMenuId = () => {
-    setOpenCommentMenuId(!openCommentMenuId);
-  }
   useEffect(() => {
     handleLikeToggle();
     handleCountComment();
@@ -139,7 +146,11 @@ export default function Post({ post }: { post: PostModel }) {
               {formatDate(post.postTime)}
             </div>
           </div>
-          <button className="p-1 rounded-full hover:bg-gray-100 transition" title="More options" aria-label="More options">
+          <button
+            className="p-1 rounded-full hover:bg-gray-100 transition"
+            title="More options"
+            aria-label="More options"
+          >
             <MoreHorizontal size={20} className="text-gray-600" />
           </button>
         </div>
@@ -157,7 +168,9 @@ export default function Post({ post }: { post: PostModel }) {
         <div className="p-2">
           <div className="flex items-center gap-3 mb-2">
             <button
-              onClick={() => { handleClickLike(post.id) }}
+              onClick={() => {
+                handleClickLike(post.id);
+              }}
               className="p-1 rounded-lg hover:bg-gray-100 transition"
             >
               <Heart
@@ -167,7 +180,10 @@ export default function Post({ post }: { post: PostModel }) {
                 className="transition-colors"
               />
             </button>
-            <button className="p-1 rounded-lg hover:bg-gray-100 transition">
+            <button
+              className="p-1 rounded-lg hover:bg-gray-100 transition"
+              onClick={() => handleShowComment()}
+            >
               <MessageCircle size={22} className="text-gray-700" />
             </button>
             <button className="p-1 rounded-lg hover:bg-gray-100 transition">
@@ -198,78 +214,37 @@ export default function Post({ post }: { post: PostModel }) {
           >
             {showComments[post.id]
               ? "Hide comments"
-              : commentCount[post.id] == 0 ? "" : `View all ${commentCount[post.id]} comments`}
+              : commentCount[post.id] == 0
+                ? ""
+                : `View all ${commentCount[post.id]} comments`}
           </div>
 
           {showComments[post.id] && comments[post.id] && (
             <div className="space-y-3 mb-3">
-              {/* Sample comment for UI preview - replace with your data */}
               {comments[post.id].map((comment) => (
-                <div>
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
-                      <img
-                        src="https://picsum.photos/seed/user1/40"
-                        alt="User"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between">
-                        <div className="text-sm">
-                          <span className="font-semibold text-gray-900 mr-2">
-                            {comment.userDisplayname}
-                          </span>
-                          <span className="text-gray-700">{comment.content}</span>
-                        </div>
-                        <div className="flex items-center" onClick={() => handleAddLikeComment(comment.id)}>
-                          <Heart
-                            size={12}
-                            fill={isLiked[comment.id] ? "#ef4444" : "none"}
-                            stroke={isLiked[comment.id] ? "#ef4444" : "#374151"}
-                            className="transition-colors"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex gap-5">
-                        <div className="text-xs text-gray-500 mt-1">
-                          {formatDate(comment.commentTime)}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer" onClick={() => handleClickReply(comment.userDisplayname)}>
-                          Reply
-                        </div>
-                        <button onClick={() => { handleOpenCommentMenuId }} className="p-1 rounded-full hover:bg-gray-100 transition" title="More options" aria-label="More options">
-                          <MoreHorizontal size={18} className="text-gray-400" />
-                        </button>
-                        {/* {openCommentMenuId && (
-                          <div className="absolute right-0 mt-2 w-32 bg-white border rounded-xl shadow-lg z-10">
-                            <button
-                              onClick={() => {
-                              }}
-                              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
-                            >
-                              Xóa bình luận
-                            </button>
-                          </div>
-                        )} */}
-                      </div>
-                    </div>
-                  </div>
-                  <RepliesComments commentId={comment.id} onReply={handleClickReply} />
-                </div>
+                  <Comment comment={comment} onReply={handleClickReply}/>
               ))}
             </div>
           )}
           {/* Add Comment */}
           <div className="border-t border-gray-100 pt-3">
-            <form className="flex items-center gap-3" onSubmit={(e) => { e.preventDefault(); handleAddComment(post.id, commentInput); }}>
+            <form
+              className="flex items-center gap-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddComment(post.id, commentInput);
+              }}
+            >
               <input
                 className="flex-1 outline-none text-sm text-gray-700 placeholder-gray-500"
                 placeholder="Add a comment..."
                 value={commentInput}
                 onChange={(e) => setCommentInput(e.target.value)}
               />
-              <button type="submit" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+              <button
+                type="submit"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition"
+              >
                 Post
               </button>
             </form>

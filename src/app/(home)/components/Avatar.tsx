@@ -1,21 +1,21 @@
 "use client"
 import { useEffect, useState } from "react";
-import { getUser } from "../services/user.service";
-import { UserModel } from "../types/user";
-import { logout } from "../api/auth/routes";
+import { getUser } from "../../services/user.service";
+import { UserModel } from "../../types/user";
+import { logout } from "../../api/auth/routes";
 
 export default function Avatar() {
-    const [user, setUser] = useState<UserModel | null>(null);
-    
-    useEffect(() => {
-      const fetchData = async () => {
-        const data = await getUser();
-        if (data) {
-          setUser(data);
-        }
-      };
-      fetchData();
-    }, []);
+  const [user, setUser] = useState<UserModel | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getUser();
+      if (data) {
+        setUser(data);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleLogout = async () => {
     await logout();

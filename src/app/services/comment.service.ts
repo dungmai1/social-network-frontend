@@ -73,3 +73,13 @@ export async function addReplies(repliesRequest: RepliesRequest) {
   return data;
 }
 
+export async function deleteComment(postId: number, commentId: number) {
+  const res = await apiFetch(`${URL_BASE}/delete?postId=${postId}?commentId=${commentId}`, { method: "DELETE" });
+  if (!res.ok) {
+    console.error("Error fetch Post");
+    return;
+  }
+  const data = await res.json();
+  return data;
+}
+
