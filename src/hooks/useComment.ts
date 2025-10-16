@@ -1,11 +1,14 @@
-import { addComment, deleteComment, getAllComment, getCountComments } from "@/services/comment.service";
+import { addComment, addReplies, deleteComment, getAllComment, getCountComments } from "@/services/comment.service";
+import { getCommentLikeInfo } from "@/services/like.service";
 import { CommentModel } from "@/types/comment";
 import { PostModel } from "@/types/post";
 import { useEffect, useState } from "react";
+import { appendReplyById } from "@/hooks/repliesRegistry";
 
 export function useComment(post: PostModel) {
     const [commentInput, setCommentInput] = useState("");
     const [showComments, setShowComments] = useState(false);
+    const [replyTo, setReplyTo] = useState<number>();
     const [comments, setComments] = useState<CommentModel[]>([]);
     const [commentCount, setCommentCount] = useState(0);
     const handleShowComment = () => {
@@ -27,16 +30,32 @@ export function useComment(post: PostModel) {
             console.log("Error count comment")
         }
     };
-    const handleClickReply = (userNameReply: string) => {
+    const handleClickReply = (userNameReply: string, commentId: number) => {
         setCommentInput(`@${userNameReply} `);
+        setReplyTo(commentId);
     };
-    const handleAddComment = async (postId: number, content: string) => {
+    const handleAddComment = async (postId: number) => {
         try {
-            const commentRequest = { postId, contentCmt: content };
-            const res = await addComment(commentRequest);
-            if (!res) return;
-            const newComments = Array.isArray(res) ? res : [res];
-            setComments((p) => [...p, ...newComments]);
+            if (commentInput.trim().length === 0) return;
+            let resp;
+            if (replyTo) {
+                resp = await addReplies(
+                    {
+                        commentId: replyTo,
+                        content: commentInput.trim()
+                    }
+                );
+                if (!resp) return;
+                const newReply = Array.isArray(resp) ? resp[0] : resp;
+                appendReplyById(replyTo, newReply);
+                setReplyTo(undefined);
+            } else {
+                const commentRequest = { postId, contentCmt: commentInput };
+                resp = await addComment(commentRequest);
+                if (!resp) return;
+                const newComments = Array.isArray(resp) ? resp : [resp];
+                setComments((p) => [...p, ...newComments]);
+            }
             setCommentInput("");
             setCommentCount((p) => p + 1);
         } catch (error) {
@@ -57,5 +76,9 @@ export function useComment(post: PostModel) {
     useEffect(() => {
         handleCountComment();
     }, []);
-    return { showComments, comments, commentCount, commentInput, handleShowComment, handleClickReply, handleAddComment, handleDeleteComment, setCommentInput }
+    return {
+        showComments, comments, commentCount, commentInput,
+        handleShowComment, handleClickReply, handleAddComment,
+        handleDeleteComment, setCommentInput
+    }
 }

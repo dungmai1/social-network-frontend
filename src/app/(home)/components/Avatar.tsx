@@ -1,25 +1,8 @@
 "use client"
-import { useEffect, useState } from "react";
-import { getUser } from "../../../services/user.service";
-import { UserModel } from "../../../types/user";
-import { logout } from "@/services/auth.service";
+import useUser from "@/hooks/useUser";
 
 export default function Avatar() {
-  const [user, setUser] = useState<UserModel | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getUser();
-      if (data) {
-        setUser(data);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const handleLogout = async () => {
-    await logout();
-  };
+  const { user, handleLogout } = useUser();
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">

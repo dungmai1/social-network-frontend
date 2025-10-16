@@ -5,7 +5,6 @@ import { formatDate } from "../../../lib/date";
 import Comment from "./Comment";
 import { useLike } from "@/hooks/useLike";
 import { useComment } from "@/hooks/useComment";
-import { CommentActionsProvider } from "@/hooks/CommentActionsContext";
 
 export default function Post({ post }: { post: PostModel }) {
   const { isLiked, likeCount, handleClickLike } = useLike(post);
@@ -75,7 +74,7 @@ export default function Post({ post }: { post: PostModel }) {
 
           {/* Likes */}
           <div className="text-sm font-semibold text-gray-900 mb-2">
-            {likeCount} likes
+            {likeCount === 0 || likeCount === 1 ? likeCount + " like" : likeCount + " likes"}
           </div>
 
           {/* Caption */}
@@ -102,13 +101,11 @@ export default function Post({ post }: { post: PostModel }) {
           </div>
 
           {showComments && comments && (
-            <CommentActionsProvider value={{ handleDeleteComment }}>
-              <div className="space-y-3 mb-3">
-                {comments.map((comment) => (
-                  <Comment key={comment.id} comment={comment} onReply={handleClickReply} />
-                ))}
-              </div>
-            </CommentActionsProvider>
+            <div className="space-y-3 mb-3">
+              {comments.map((comment) => (
+                <Comment key={comment.id} post={post} comment={comment} onReply={handleClickReply} onDelete={handleDeleteComment} />
+              ))}
+            </div>
           )}
           {/* Add Comment */}
           <div className="border-t border-gray-100 pt-3">
@@ -116,7 +113,7 @@ export default function Post({ post }: { post: PostModel }) {
               className="flex items-center gap-3"
               onSubmit={(e) => {
                 e.preventDefault();
-                handleAddComment(post.id, commentInput);
+                handleAddComment(post.id);
               }}
             >
               <input

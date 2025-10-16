@@ -23,7 +23,7 @@ export function useLike(post: PostModel) {
                 setLikeCount((c) => c + (isLiked ? -1 : 1));
             }
         } catch (error) {
-            console.log("Error click like");
+            console.error("Error click like:", error);
         }
     };
     useEffect(() => {

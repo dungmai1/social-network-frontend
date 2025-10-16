@@ -64,12 +64,12 @@ export async function getAllRepliesComments(commentId: number) {
 }
 
 export async function addReplies(repliesRequest: RepliesRequest) {
-  const res = await apiFetch(`${URL_BASE}/replies/create`, { method: "POST", body: JSON.stringify(addReplies) });
+  const res = await apiFetch(`${URL_BASE}/replies/create`, { method: "POST", body: JSON.stringify(repliesRequest) });
   if (!res.ok) {
     console.error("Error fetch Post");
     return;
   }
-  const data: RepliesRequest[] = await res.json();
+  const data: CommentModel[] = await res.json();
   return data;
 }
 

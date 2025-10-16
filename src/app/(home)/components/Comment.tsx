@@ -1,13 +1,16 @@
 import { formatDate } from "@/lib/date";
 import DeleteDialog from "@/components/comment/DeleteDialog";
-import { useCommentActions } from "@/hooks/CommentActionsContext";
 import RepliesComments from "./RepliesComments";
 import { CommentModel } from "@/types/comment";
 import { Heart } from "lucide-react";
-import { useComment } from "@/hooks/useComment";
+import { useCommentInfo } from "@/hooks/useCommentInfo";
+import useUser from "@/hooks/useUser";
+import { PostModel } from "@/types/post";
 
-export default function Comment({ comment, onReply }: { comment: CommentModel, onReply: (username: string) => void }) {
-    const { handleDeleteComment } = useCommentActions();
+export default function Comment({ post, comment, onReply, onDelete }: { post: PostModel, comment: CommentModel, onReply: (username: string, commentId:number) => void, onDelete: (postId: number, commentId: number) => void }) {
+    const { isLikeComment, likeCommentCount, handleAddLikeComment } = useCommentInfo(comment);
+    const { user } = useUser();
+    const canDelete = user?.displayname === comment.userDisplayname || user?.displayname === post.displayName;
     return (
         <div>
             <div className="flex gap-3">
@@ -30,34 +33,45 @@ export default function Comment({ comment, onReply }: { comment: CommentModel, o
                         </div>
                         <div
                             className="flex items-center"
-                        // onClick={() => handleAddLikeComment(comment.id)}
+                            onClick={() => handleAddLikeComment(comment.id)}
                         >
                             <button>
                                 <Heart
                                     size={12}
-                                    //   fill={isLiked[comment.id] ? "#ef4444" : "none"}
-                                    //   stroke={isLiked[comment.id] ? "#ef4444" : "#374151"}
+                                    fill={isLikeComment ? "#ef4444" : "none"}
+                                    stroke={isLikeComment ? "#ef4444" : "#374151"}
                                     className="transition-colors"
                                 />
                             </button>
                         </div>
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 mt-1">
                         <div className="text-xs text-gray-500 mt-1">
                             {formatDate(comment.commentTime)}
                         </div>
+                        {likeCommentCount > 0 && (
+                            <div
+                                className="text-xs text-gray-500 mt-1 font-semibold"
+                            >
+                                {likeCommentCount === 1 ? likeCommentCount + " like" : likeCommentCount + " likes"}
+                            </div>
+                        )}
+
                         <div
                             className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer"
                             onClick={() =>
-                                onReply(comment.userDisplayname)
+                                onReply(comment.userDisplayname, comment.id)
                             }
                         >
                             Reply
                         </div>
-                        <DeleteDialog postId={comment.postId}
-                            commentId={comment.id}
-                            onDelete={handleDeleteComment}
-                        />
+                        {canDelete && (
+                            <DeleteDialog postId={comment.postId}
+                                commentId={comment.id}
+                                onDelete={onDelete}
+                            />
+                        )}
+
                     </div>
                 </div>
             </div>
@@ -65,6 +79,7 @@ export default function Comment({ comment, onReply }: { comment: CommentModel, o
                 key={comment.id}
                 commentId={comment.id}
                 onReply={onReply}
+                onDelete={onDelete}
             />
         </div>
     )

@@ -25,7 +25,7 @@ export async function getLikePost(postId: number) {
   return data;
 }
 
-export async function getLikeComment(commentId: number) {
+export async function getCommentLikeInfo(commentId: number) {
   const res = await apiFetch(`${URL_BASE}/comment/count?commentId=${commentId}`, {
     method: "GET"
   });

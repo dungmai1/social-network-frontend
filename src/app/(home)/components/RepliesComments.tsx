@@ -1,34 +1,10 @@
-import { useEffect, useState } from "react";
-import { getAllRepliesComments, getCountRepliesComments } from "../../../services/comment.service";
-import { CommentModel } from "../../../types/comment";
 import { Heart } from "lucide-react";
 import { formatDate } from "../../../lib/date";
+import useReplies from "@/hooks/useReplies";
 import DeleteDialog from "@/components/comment/DeleteDialog";
 
-export default function RepliesComments({ commentId, onReply }: { commentId: number, onReply: (userName: string) => void; }) {
-    const [repliesCount, setRepliesCount] = useState(0);
-    const [replies, setReplies] = useState<{ [key: number]: CommentModel[] }>({});
-    const [showReply, setShowReply] = useState<boolean>(false);
-    const [commentInput, setCommentInput] = useState("");
-    const handleGetCountRepliesComment = async (commentId: number) => {
-        const res = await getCountRepliesComments(commentId);
-        setRepliesCount(res);
-    }
-    const handleGetAllRepliesComment = async (commentId: number) => {
-        const res = await getAllRepliesComments(commentId);
-        setReplies((prev) => ({
-            ...prev,
-            [commentId]: res
-        }
-        ))
-        setShowReply(!showReply);
-    }
-    const handleClickReply = (userNameReply: String) => {
-        setCommentInput(`@${userNameReply} `);
-    }
-    useEffect(() => {
-        handleGetCountRepliesComment(commentId)
-    }, [])
+export default function RepliesComments({ commentId, onReply, onDelete }: { commentId: number, onReply: (userName: string, commentId: number) => void; onDelete: (postId: number, commentId: number) => void }) {
+    const { repliesCount, replies, showReply, handleGetAllRepliesComment } = useReplies(commentId);
     return (
         <>
             {repliesCount > 0 && (
@@ -42,11 +18,11 @@ export default function RepliesComments({ commentId, onReply }: { commentId: num
                             </span>
                         </div>
                     </div>
-                    {replies[commentId] && showReply && (
+                    {showReply && (
                         <div className="space-y-3 mb-3">
                             {/* Sample comment for UI preview - replace with your data */}
-                            {replies[commentId].map((replies) => (
-                                <div>
+                            {replies.map((replies) => (
+                                <div key={replies.id}>
                                     <div className="flex gap-3">
                                         <div className="w-6 h-6" />
                                         <div className="w-6 h-6 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
@@ -77,10 +53,12 @@ export default function RepliesComments({ commentId, onReply }: { commentId: num
                                                 <div className="text-xs text-gray-500 mt-1">
                                                     {formatDate(replies.commentTime)}
                                                 </div>
-                                                <div className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer" onClick={() => onReply(replies.userDisplayname)}>
+                                                <div className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer" onClick={() => onReply(replies.userDisplayname, commentId)}>
                                                     Reply
                                                 </div>
-                                                {/* <DeleteDialog postId={replies.postId} commentId={replies.id} /> */}
+                                                {/* {canDelete && ( */}
+                                                <DeleteDialog postId={replies.postId} commentId={replies.id} onDelete={onDelete} />
+                                                {/* )} */}
                                             </div>
                                         </div>
                                     </div>
