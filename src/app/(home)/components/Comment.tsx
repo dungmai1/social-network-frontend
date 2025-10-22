@@ -6,17 +6,18 @@ import { Heart } from "lucide-react";
 import { useCommentInfo } from "@/hooks/useCommentInfo";
 import useUser from "@/hooks/useUser";
 import { PostModel } from "@/types/post";
+import useReplies from "@/hooks/useReplies";
 
 export default function Comment({ post, comment, onReply, onDelete }: { post: PostModel, comment: CommentModel, onReply: (username: string, commentId:number) => void, onDelete: (postId: number, commentId: number) => void }) {
-    const { isLikeComment, likeCommentCount, handleAddLikeComment } = useCommentInfo(comment);
+    const { isLikeComment, likeCommentCount , handleAddLikeComment} = useCommentInfo(comment);
     const { user } = useUser();
-    const canDelete = user?.displayname === comment.userDisplayname || user?.displayname === post.displayName;
+    const canDelete = user?.username === comment.userDisplayname || user?.username === post.username;
     return (
         <div>
             <div className="flex gap-3">
                 <div className="w-6 h-6 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
                     <img
-                        src="https://picsum.photos/seed/user1/40"
+                        src={comment.userAvatar}
                         alt="User"
                         className="w-full h-full object-cover"
                     />

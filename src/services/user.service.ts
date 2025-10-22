@@ -1,3 +1,4 @@
+import { UserModel } from "@/types/user";
 import { apiFetch } from "../lib/api";
 
 const URL_BASE = "/user"
@@ -8,5 +9,15 @@ export async function getUser() {
     return;
   }
   const data = await res.json();
+  return data;
+}
+
+export async function getUserbyUsername(username: string) {
+  const res = await apiFetch(`${URL_BASE}/${username}`, { method: "GET" });
+  if (!res.ok) {
+    console.error("Error fetch Post");
+    return;
+  }
+  const data= await res.json();
   return data;
 }

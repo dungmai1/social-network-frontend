@@ -8,30 +8,42 @@ import { useComment } from "@/hooks/useComment";
 
 export default function Post({ post }: { post: PostModel }) {
   const { isLiked, likeCount, handleClickLike } = useLike(post);
-  const { showComments, comments, commentCount, commentInput, handleShowComment, handleClickReply, handleAddComment, handleDeleteComment, setCommentInput } = useComment(post);
+  const {
+    showComments,
+    comments,
+    commentCount,
+    commentInput,
+    handleShowComment,
+    handleClickReply,
+    handleAddComment,
+    handleDeleteComment,
+    setCommentInput,
+  } = useComment(post);
   return (
     <div className="space-y-6">
       <article className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
         <div className="flex items-center gap-3 p-4">
           <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
-            <img
-              src={post.avatar}
-              alt={post.displayName}
-              className="w-full h-full object-cover"
-            />
+            <a href={`/profile/${post.username}`}>
+              <img
+                src={post.avatar}
+                alt={post.username}
+                className="w-full h-full object-cover"
+              />
+            </a>
           </div>
           <div className="flex-1">
-            <div className="text-sm font-semibold text-gray-900">
-              {post.displayName}
-            </div>
+            <a href={`/profile/${post.username}`}>
+              <div className="text-sm font-semibold text-gray-900">
+                {post.username}
+              </div>
+            </a>
             <div className="text-xs text-gray-500">
               {formatDate(post.postTime)}
             </div>
           </div>
-          <button
-            className="p-1 rounded-full hover:bg-gray-100 transition"
-          >
+          <button className="p-1 rounded-full hover:bg-gray-100 transition">
             <MoreHorizontal size={20} className="text-gray-600" />
           </button>
         </div>
@@ -74,13 +86,15 @@ export default function Post({ post }: { post: PostModel }) {
 
           {/* Likes */}
           <div className="text-sm font-semibold text-gray-900 mb-2">
-            {likeCount === 0 || likeCount === 1 ? likeCount + " like" : likeCount + " likes"}
+            {likeCount === 0 || likeCount === 1
+              ? likeCount + " like"
+              : likeCount + " likes"}
           </div>
 
           {/* Caption */}
           <div className="text-sm mb-2">
             <span className="font-semibold text-gray-900 mr-2">
-              {post.displayName}
+              {post.username}
             </span>
             <span className="text-gray-700">
               {post.content ||
@@ -96,14 +110,20 @@ export default function Post({ post }: { post: PostModel }) {
             {showComments
               ? "Hide comments"
               : commentCount == 0
-                ? ""
-                : `View all ${commentCount} comments`}
+              ? ""
+              : `View all ${commentCount} comments`}
           </div>
 
           {showComments && comments && (
             <div className="space-y-3 mb-3">
               {comments.map((comment) => (
-                <Comment key={comment.id} post={post} comment={comment} onReply={handleClickReply} onDelete={handleDeleteComment} />
+                <Comment
+                  key={comment.id}
+                  post={post}
+                  comment={comment}
+                  onReply={handleClickReply}
+                  onDelete={handleDeleteComment}
+                />
               ))}
             </div>
           )}

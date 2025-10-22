@@ -16,7 +16,7 @@ export default function Avatar() {
         </div>
         <div className="flex-1">
           <div className="font-semibold text-gray-900 text-sm">{user?.username}</div>
-          <div className="text-xs text-gray-500">{user?.displayname}</div>
+          <div className="text-xs text-gray-500">{user?.username}</div>
         </div>
         <button onClick={handleLogout} className="text-xs text-blue-600 hover:text-blue-800 font-medium">
           Log out
