@@ -10,21 +10,19 @@ import {
 import useUser from "@/hooks/useUser";
 import { usePost } from "@/hooks/usePost";
 
-export default function ProfilePage( params: any ) {
+export default function ProfilePage({ params }: { params: { username: string } }) {
   const { username } = params;
-  const { user, getUserInfo, userInfo } = useUser();
-  const { postLists } = usePost();
+  const { getUserInfo, userInfo } = useUser();
+  // const { postLists } = usePost();
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
     "posts"
   );
 
-  const userPosts = postLists.filter(
-    (post) => post.username === user?.displayname
-  );
+  const userPosts = [1];
 
   // Mock data for demonstration
   const stats = {
-    posts: userPosts.length,
+    posts: 1,
     followers: 1234,
     following: 567,
   };
@@ -34,9 +32,9 @@ export default function ProfilePage( params: any ) {
     { id: "saved" as const, label: "Saved", icon: Bookmark },
     { id: "tagged" as const, label: "Tagged", icon: UserCheck },
   ];
-  useEffect (()=>{
+  useEffect(() => {
     getUserInfo(username);
-  },[])
+  }, [username])
   return (
     <div className="max-w-4xl mx-auto bg-white min-h-screen">
       {/* Profile Header */}
@@ -60,7 +58,7 @@ export default function ProfilePage( params: any ) {
             {/* Username and Actions */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <h1 className="text-2xl font-light text-gray-900">
-                {user?.username || "username"}
+                {userInfo?.username || "username"}
               </h1>
               <div className="flex gap-2">
                 <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
@@ -103,7 +101,7 @@ export default function ProfilePage( params: any ) {
             {/* Bio */}
             <div className="space-y-1">
               <div className="font-semibold text-gray-900">
-                {user?.displayname || "Display Name"}
+                {userInfo?.displayname || "Display Name"}
               </div>
               <div className="text-gray-900">
                 This is a sample bio for the Instagram-like profile page. You
@@ -129,11 +127,10 @@ export default function ProfilePage( params: any ) {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-8 py-4 text-sm font-medium border-t-2 transition ${
-                    activeTab === tab.id
-                      ? "border-gray-900 text-gray-900"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
+                  className={`flex items-center gap-2 px-8 py-4 text-sm font-medium border-t-2 transition ${activeTab === tab.id
+                    ? "border-gray-900 text-gray-900"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
                 >
                   <Icon size={16} />
                   <span className="hidden sm:inline">{tab.label}</span>
@@ -151,11 +148,11 @@ export default function ProfilePage( params: any ) {
             {userPosts.length > 0 ? (
               userPosts.map((post) => (
                 <div
-                  key={post.id}
+                  // key={post.id}
                   className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer"
                 >
                   <img
-                    src={`https://picsum.photos/seed/post-${post.id}/400/400`}
+                    src={`https://picsum.photos/seed/post-/400/400`}
                     alt="Post"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />

@@ -7,27 +7,34 @@ import { useCommentInfo } from "@/hooks/useCommentInfo";
 import useUser from "@/hooks/useUser";
 import { PostModel } from "@/types/post";
 import useReplies from "@/hooks/useReplies";
+import Link from "next/link";
 
-export default function Comment({ post, comment, onReply, onDelete }: { post: PostModel, comment: CommentModel, onReply: (username: string, commentId:number) => void, onDelete: (postId: number, commentId: number) => void }) {
-    const { isLikeComment, likeCommentCount , handleAddLikeComment} = useCommentInfo(comment);
+export default function Comment({ post, comment, onReply, onDelete }: { post: PostModel, comment: CommentModel, onReply: (username: string, commentId: number) => void, onDelete: (postId: number, commentId: number) => void }) {
+    const { isLikeComment, likeCommentCount, handleAddLikeComment } = useCommentInfo(comment);
     const { user } = useUser();
-    const canDelete = user?.username === comment.userDisplayname || user?.username === post.username;
+    const canDelete = user?.username === comment.username || user?.username === post.username;
     return (
         <div>
             <div className="flex gap-3">
                 <div className="w-6 h-6 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
-                    <img
-                        src={comment.userAvatar}
-                        alt="User"
-                        className="w-full h-full object-cover"
-                    />
+                    <Link href={`/profile/${comment.username}`}>
+                        <img
+                            src={comment.userAvatar}
+                            alt="User"
+                            className="w-full h-full object-cover"
+                        />
+                    </Link>
                 </div>
                 <div className="flex-1">
                     <div className="flex justify-between">
                         <div className="text-sm">
-                            <span className="font-semibold text-gray-900 mr-2">
-                                {comment.userDisplayname}
-                            </span>
+                            <div>
+                                <Link href={`/profile/${comment.username}`}>
+                                    <span className="font-semibold text-gray-900 mr-2">
+                                        {comment.username}
+                                    </span>
+                                </Link>
+                            </div>
                             <span className="text-gray-700">
                                 {comment.content}
                             </span>
@@ -61,7 +68,7 @@ export default function Comment({ post, comment, onReply, onDelete }: { post: Po
                         <div
                             className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer"
                             onClick={() =>
-                                onReply(comment.userDisplayname, comment.id)
+                                onReply(comment.username, comment.id)
                             }
                         >
                             Reply

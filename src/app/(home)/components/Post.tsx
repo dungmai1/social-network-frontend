@@ -5,6 +5,7 @@ import { formatDate } from "../../../lib/date";
 import Comment from "./Comment";
 import { useLike } from "@/hooks/useLike";
 import { useComment } from "@/hooks/useComment";
+import Link from "next/link";
 
 export default function Post({ post }: { post: PostModel }) {
   const { isLiked, likeCount, handleClickLike } = useLike(post);
@@ -25,20 +26,20 @@ export default function Post({ post }: { post: PostModel }) {
         {/* Header */}
         <div className="flex items-center gap-3 p-4">
           <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
-            <a href={`/profile/${post.username}`}>
+            <Link href={`/profile/${post.username}`}>
               <img
                 src={post.avatar}
                 alt={post.username}
                 className="w-full h-full object-cover"
               />
-            </a>
+            </Link>
           </div>
           <div className="flex-1">
-            <a href={`/profile/${post.username}`}>
+            <Link href={`/profile/${post.username}`}>
               <div className="text-sm font-semibold text-gray-900">
                 {post.username}
               </div>
-            </a>
+            </Link>
             <div className="text-xs text-gray-500">
               {formatDate(post.postTime)}
             </div>
