@@ -23,7 +23,7 @@ function ReplyItem({ reply, onReply, onDelete }: { reply: CommentModel, onReply:
                     <div className="flex justify-between">
                         <div className="text-sm">
                             <span className="font-semibold text-gray-900 mr-2">
-                                {reply.userDisplayname}
+                                {reply.username}
                             </span>
                             <span className="text-gray-700">{reply.content}</span>
                         </div>
@@ -47,7 +47,7 @@ function ReplyItem({ reply, onReply, onDelete }: { reply: CommentModel, onReply:
                                 {likeCommentCount === 1 ? likeCommentCount + " like" : likeCommentCount + " likes"}
                             </div>
                         )}
-                        <div className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer" onClick={() => onReply(reply.userDisplayname, reply.id)}>
+                        <div className="text-xs text-gray-500 mt-1 font-semibold cursor-pointer" onClick={() => onReply(reply.username, reply.id)}>
                             Reply
                         </div>
                         <DeleteDialog postId={reply.postId} commentId={reply.id} onDelete={onDelete} />

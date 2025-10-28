@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Heart, MessageCircle, Search, Clapperboard } from "lucide-react";
 import Avatar from "./components/Avatar";
 import Post from "./components/Post";
-import { PostModel } from "../../types/post";
-import { getAllPost } from "../../services/post.service";
 import { usePost } from "@/hooks/usePost";
 
 function Header() {
@@ -55,7 +53,8 @@ function Story({ name }: any) {
 }
 
 export default function Home() {
-  const {postLists} = usePost();
+  const { allPostsQuery} = usePost();
+  const { data: allPosts, isLoading: isAllLoading, isError: isAllError, refetch: refetchAll } = allPostsQuery;
   const stories = [
     "you",
     "alice",
@@ -100,9 +99,29 @@ export default function Home() {
             </div>
           </div>
           <div className="space-y-6">
-            {postLists.map((post) => (
-              <Post key={post.id} post={post} />
-            ))}
+            {isAllLoading ? (
+              <div className="animate-pulse space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-1/3" />
+                <div className="h-4 bg-gray-200 rounded w-2/3" />
+              </div>
+            ) : (
+              allPosts?.map((post) => (
+                <Post key={post.id} post={post} />
+              ))
+            )}
+            {
+              isAllError && (
+                <div className="p-4 text-center">
+                <p className="text-red-500 mb-2">Không thể tải bình luận 😥</p>
+                <button
+                  onClick={() => refetchAll()}
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Thử lại
+                </button>
+              </div>
+              )
+            }
           </div>
         </section>
         {/* SIDEBAR RIGHT */}

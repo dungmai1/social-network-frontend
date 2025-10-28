@@ -94,9 +94,11 @@ export default function Post({ post }: { post: PostModel }) {
 
           {/* Caption */}
           <div className="text-sm mb-2">
-            <span className="font-semibold text-gray-900 mr-2">
-              {post.username}
-            </span>
+            <Link href={`/profile/${post.username}`}>
+              <span className="font-semibold text-gray-900 mr-2">
+                {post.username}
+              </span>
+            </Link>
             <span className="text-gray-700">
               {post.content ||
                 "This is a sample caption showing how the post will look."}
@@ -111,8 +113,8 @@ export default function Post({ post }: { post: PostModel }) {
             {showComments
               ? "Hide comments"
               : commentCount == 0
-              ? ""
-              : `View all ${commentCount} comments`}
+                ? ""
+                : `View all ${commentCount} comments`}
           </div>
 
           {showComments && comments && (
