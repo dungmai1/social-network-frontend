@@ -5,3 +5,19 @@ export interface UserModel {
   displayname: string;
   avatar: string;
 }
+
+export interface RelationshipModel {
+  followerCount: number;
+  followingCount: number;
+  follower: boolean;  
+  following: boolean; 
+  self: boolean;      
+}
+
+export interface UserProfileModel {
+  id: number;
+  username: string;
+  avatar: string;
+  bio: string | null;
+  relationship: RelationshipModel;
+}

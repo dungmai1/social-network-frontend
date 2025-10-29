@@ -21,7 +21,7 @@ function ProfilePostItem({ post }: { post: PostModel }) {
   return (
     <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer relative">
       <img
-        src={post.imageUrl}
+        src={post.images?.[0]}
         alt="Post"
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
       />
@@ -47,7 +47,7 @@ function ProfilePostItem({ post }: { post: PostModel }) {
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = React.use(params);
   const { getUserInfo, userInfo } = useUser();
-  const {countFollower, countFollowing} = useRelationship(username);
+  const { handleAddFollow } = useRelationship(username);
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
     "posts"
   );
@@ -58,11 +58,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const [showDialog, setShowDialog] = useState(false);
   const [selectedPost, setSelectedPost] = useState<PostModel | null>(null);
 
-  // Mock data for demonstration
   const stats = {
     posts: safeUserPosts.length,
-    followers: countFollower ?? 0,
-    following: countFollowing ?? 0,
+    followers: userInfo?.relationship.followerCount ?? 0,
+    following: userInfo?.relationship.followingCount ?? 0,
   };
 
   const tabs = [
@@ -85,7 +84,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 src={
                   userInfo?.avatar || "https://picsum.photos/seed/avatar/400/400"
                 }
-                alt={userInfo?.displayname || "Profile"}
+                alt={userInfo?.username || "Profile"}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -99,12 +98,35 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 {userInfo?.username || "username"}
               </h1>
               <div className="flex gap-2">
-                <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
-                  Edit profile
-                </button>
-                <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
-                  Share profile
-                </button>
+                {userInfo?.relationship.self ? (
+                  <>
+                    <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                      Edit profile
+                    </button>
+                    <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                      Share profile
+                    </button>
+                  </>
+                ) :
+                  (
+                    <>
+                      {
+                        userInfo?.relationship.following ? (
+                          <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                            Following
+                          </button>
+                        ) :
+                          (
+                            <button onClick={() => handleAddFollow()} className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                              Follow
+                            </button>
+                          )
+                      }
+                      <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                        Message
+                      </button>
+                    </>
+                  )}
                 <button className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-md transition">
                   <Settings size={16} />
                 </button>
@@ -139,7 +161,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             {/* Bio */}
             <div className="space-y-1">
               <div className="font-semibold text-gray-900">
-                {userInfo?.displayname || "Display Name"}
+                {userInfo?.username || "Display Name"}
               </div>
               <div className="text-gray-900">
                 This is a sample bio for the Instagram-like profile page. You

@@ -17,6 +17,6 @@ export async function getUserbyUsername(username: string) {
     console.error("Error fetch Post");
     return;
   }
-  const data= await res.json();
+  const data = await res.json();
   return data;
 }

@@ -1,11 +1,11 @@
 import { logout } from "@/services/auth.service";
 import { getUser, getUserbyUsername } from "@/services/user.service";
-import { UserModel } from "@/types/user";
+import { UserModel, UserProfileModel } from "@/types/user";
 import { useEffect, useState } from "react";
 
 export default function useUser() {
   const [user, setUser] = useState<UserModel | null>(null);
-  const [userInfo, setUserInfo] = useState<UserModel | null>(null);
+  const [userInfo, setUserInfo] = useState<UserProfileModel | null>(null);
   useEffect(() => {
     const fetchData = async () => {
       const data = await getUser();

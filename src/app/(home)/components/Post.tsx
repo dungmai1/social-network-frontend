@@ -6,8 +6,16 @@ import Comment from "./Comment";
 import { useLike } from "@/hooks/useLike";
 import { useComment } from "@/hooks/useComment";
 import Link from "next/link";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
 
 export default function Post({ post }: { post: PostModel }) {
+  const hasMultiple = post.images.length > 1;
   const { isLiked, likeCount, handleClickLike } = useLike(post);
   const {
     showComments,
@@ -51,11 +59,30 @@ export default function Post({ post }: { post: PostModel }) {
 
         {/* Image */}
         <div className="relative w-full aspect-square bg-gray-100">
-        <img
-            src={post.imageUrl}
-            alt="post"
-            className="absolute top-0 left-0 w-full h-full object-cover"
-            />
+          {post.images && Array.isArray(post.images) && post.images.length > 0 ? (
+            <Carousel className="w-full h-full">
+              <CarouselContent>
+                {post.images.map((img, i) => (
+                  <CarouselItem key={i} className="flex items-center justify-center">
+                    <img
+                      src={img}
+                      alt={`post-img-${i}`}
+                      className="w-full h-full object-contain rounded"
+                      style={{ maxHeight: "400px", maxWidth: "100%" }}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {hasMultiple &&
+                <>
+                  <CarouselPrevious className="left-2" />
+                  <CarouselNext className="right-2" />
+                </>
+              }
+            </Carousel>
+          ) : (
+            <span className="text-gray-400">No image</span>
+          )}
         </div>
 
         {/* Actions */}

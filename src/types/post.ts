@@ -6,5 +6,5 @@ export interface PostModel {
   username: string;
   avatar: string;
   status: string;
-  imageUrl: string;
+  images: string[];
 }
