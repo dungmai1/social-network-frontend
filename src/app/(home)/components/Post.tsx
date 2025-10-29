@@ -21,7 +21,7 @@ export default function Post({ post }: { post: PostModel }) {
     setCommentInput,
   } = useComment(post);
   return (
-    <div className="space-y-6">
+    <div>
       <article className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
         <div className="flex items-center gap-3 p-4">
@@ -50,16 +50,16 @@ export default function Post({ post }: { post: PostModel }) {
         </div>
 
         {/* Image */}
-        <div className="w-full h-96 bg-gray-100">
-          <img
-            src={`https://picsum.photos/seed/post-${post.id}/1200/900`}
+        <div className="relative w-full aspect-square bg-gray-100">
+        <img
+            src={post.imageUrl}
             alt="post"
-            className="w-full h-full object-cover"
-          />
+            className="absolute top-0 left-0 w-full h-full object-cover"
+            />
         </div>
 
         {/* Actions */}
-        <div className="p-2">
+        <div className="p-3">
           <div className="flex items-center gap-3 mb-2">
             <button
               onClick={() => {

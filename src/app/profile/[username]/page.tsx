@@ -14,6 +14,7 @@ import { useComment } from "@/hooks/useComment";
 import { PostModel } from "@/types/post";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Post from "@/app/(home)/components/Post";
+import useRelationship from "@/hooks/useRelationship";
 function ProfilePostItem({ post }: { post: PostModel }) {
   const { likeCount } = useLike(post);
   const { commentCount } = useComment(post);
@@ -46,7 +47,7 @@ function ProfilePostItem({ post }: { post: PostModel }) {
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = React.use(params);
   const { getUserInfo, userInfo } = useUser();
-  // const { postLists } = usePost();
+  const {countFollower, countFollowing} = useRelationship(username);
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
     "posts"
   );
@@ -59,9 +60,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
   // Mock data for demonstration
   const stats = {
-    posts: 1,
-    followers: 1234,
-    following: 567,
+    posts: safeUserPosts.length,
+    followers: countFollower ?? 0,
+    following: countFollowing ?? 0,
   };
 
   const tabs = [

@@ -1,4 +1,3 @@
-import { UserModel } from "@/types/user";
 import { apiFetch } from "../lib/api";
 
 const URL_BASE = "/user"
