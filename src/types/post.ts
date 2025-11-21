@@ -8,3 +8,8 @@ export interface PostModel {
   status: string;
   images: string[];
 }
+
+export interface PostResponse {
+  data: PostModel[];
+  nextCursor: string | null;
+}

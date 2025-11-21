@@ -1,12 +1,14 @@
 "use client";
 
-import React from "react";
-import { Heart, MessageCircle, Search, Clapperboard, Home as HomeIcon, Compass, User, Film } from "lucide-react";
+import React, { useCallback, useMemo, useRef } from "react";
+import { Heart, MessageCircle, Search, Clapperboard, Home as HomeIcon, Compass, User, Film, Plus } from "lucide-react";
 import Avatar from "./components/Avatar";
 import Post from "./components/Post";
 import { usePost } from "@/hooks/usePost";
 import useUser from "@/hooks/useUser";
 import Link from "next/link";
+import useIntersectionObserver from "@/hooks/useIntersectionObserver";
+import CreatePostDialog from "./components/CreatePostDialog";
 
 function Header() {
   return (
@@ -57,7 +59,22 @@ function Story({ name }: any) {
 export default function Home() {
   const { allPostsQuery } = usePost();
   const { user } = useUser();
-  const { data: allPosts, isLoading: isAllLoading, isError: isAllError, refetch: refetchAll } = allPostsQuery;
+  const {
+    data: allPostsPages,
+    isLoading: isAllLoading,
+    isError: isAllError,
+    refetch: refetchAll,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = allPostsQuery;
+
+  const allPosts = useMemo(
+    () => ({
+      data: allPostsPages?.pages?.flatMap((page) => page?.data ?? []) ?? [],
+    }),
+    [allPostsPages]
+  );
   const stories = [
     "you",
     "alice",
@@ -68,6 +85,19 @@ export default function Home() {
     "frank",
     "gina",
   ];
+  const triggerRef = useRef(null);
+
+  const handleIntersect = useCallback(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    fetchNextPage();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  useIntersectionObserver({
+    target: triggerRef as any,
+    onIntersect: handleIntersect,
+    enabled: !!hasNextPage,
+    threshold: 0,
+  });
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <Header />
@@ -91,17 +121,28 @@ export default function Home() {
               <MessageCircle size={22} className="text-emerald-600 group-hover:scale-110 transition" />
               <span className="font-medium text-gray-800 text-base">Message</span>
             </div>
+            <CreatePostDialog
+              trigger={
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-xl bg-white p-3 transition hover:bg-gray-50 hover:shadow-lg group"
+                >
+                  <Plus size={22} className="text-emerald-600 transition group-hover:scale-110" />
+                  <span className="text-base font-medium text-gray-800">Create</span>
+                </button>
+              }
+            />
             <Link href={`/profile/${user?.username}`}>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <div className="w-7 h-7 rounded-full overflow-hidden border border-gray-200">
-                <img
-                  className="w-full h-full object-cover"
-                  src={user?.avatar}
-                  alt={user?.username || "User"}
-                />
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
+                <div className="w-7 h-7 rounded-full overflow-hidden border border-gray-200">
+                  <img
+                    className="w-full h-full object-cover"
+                    src={user?.avatar}
+                    alt={user?.username || "User"}
+                  />
+                </div>
+                <span className="font-medium text-gray-800 text-base">Profile</span>
               </div>
-              <span className="font-medium text-gray-800 text-base">Profile</span>
-            </div>
             </Link>
           </nav>
         </aside>
@@ -114,6 +155,29 @@ export default function Home() {
               ))}
             </div>
           </div>
+          <div className="bg-white rounded-2xl shadow-lg p-5 mb-7 border border-gray-100 w-full max-w-2xl">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">
+                <img
+                  src={user?.avatar || `https://picsum.photos/seed/${user?.username || "create"}/80`}
+                  alt={user?.username || "User"}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <CreatePostDialog
+                trigger={
+                  <button
+                    type="button"
+                    className="flex flex-1 items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 text-left text-sm text-gray-600 transition hover:border-gray-300 hover:bg-gray-50"
+                  >
+                    <span className="font-medium text-gray-700">Chia sẻ điều gì đó...</span>
+                    <Plus size={18} className="text-emerald-600" />
+                  </button>
+                }
+              />
+            </div>
+            <p className="mt-3 text-xs text-gray-400">Bạn có thể tải lên tối đa 5 ảnh cho mỗi bài viết.</p>
+          </div>
           <div className="w-full max-w-2xl space-y-3">
             {isAllLoading ? (
               <div className="animate-pulse space-y-2">
@@ -121,7 +185,7 @@ export default function Home() {
                 <div className="h-4 bg-gray-200 rounded w-2/3" />
               </div>
             ) : (
-              allPosts?.map((post) => (
+              allPosts?.data?.map((post) => (
                 <Post key={post.id} post={post} />
               ))
             )}
@@ -139,6 +203,14 @@ export default function Home() {
               )
             }
           </div>
+          {allPosts?.data && allPosts?.data?.length > 0 && (
+            <>
+              {isFetchingNextPage && (
+                <div className="py-4 text-gray-500 text-sm">Đang tải thêm...</div>
+              )}
+              <div ref={triggerRef}></div>
+            </>
+          )}
         </section>
         {/* SIDEBAR RIGHT */}
         <aside className="hidden lg:block pt-2 w-full max-w-xs">

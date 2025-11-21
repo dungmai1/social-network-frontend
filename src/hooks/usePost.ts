@@ -1,10 +1,12 @@
 import { getAllPost, getAllPostByUsername } from "@/services/post.service";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
-export function usePost(username?:string) {
-  const allPostsQuery = useQuery({
+export function usePost(username?: string) {
+  const allPostsQuery = useInfiniteQuery({
     queryKey: ["posts"],
-    queryFn: getAllPost,
+    queryFn: ({ pageParam = "" }) => getAllPost(pageParam),
+    initialPageParam: "",
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? undefined,
     enabled: !username,
   });
 
