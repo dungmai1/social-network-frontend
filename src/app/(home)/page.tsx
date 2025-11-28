@@ -9,6 +9,7 @@ import useUser from "@/hooks/useUser";
 import Link from "next/link";
 import useIntersectionObserver from "@/hooks/useIntersectionObserver";
 import CreatePostDialog from "./components/CreatePostDialog";
+import useRelationship from "@/hooks/useRelationship";
 
 function Header() {
   return (
@@ -39,25 +40,8 @@ function Header() {
   );
 }
 
-function Story({ name }: any) {
-  return (
-    <div className="flex flex-col items-center w-20 group cursor-pointer">
-      <div className="w-16 h-16 rounded-full border-2 border-gray-300 overflow-hidden group-hover:border-gray-400 transition">
-        <img
-          src={`https://picsum.photos/seed/${name}/80`}
-          alt={name}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="text-xs mt-2 truncate w-full text-center text-gray-700 font-medium">
-        {name}
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
-  const { allPostsQuery } = usePost();
+  const { allPostsQuery, savePostMutation } = usePost();
   const { user } = useUser();
   const {
     data: allPostsPages,
@@ -68,6 +52,12 @@ export default function Home() {
     hasNextPage,
     isFetchingNextPage,
   } = allPostsQuery;
+  const {
+    listRecommend,
+    isLoadingRecommend,
+    handleRecommendUser,
+    handleAddFollow,
+  } = useRelationship(user?.username ?? "");
 
   const allPosts = useMemo(
     () => ({
@@ -91,6 +81,17 @@ export default function Home() {
     if (!hasNextPage || isFetchingNextPage) return;
     fetchNextPage();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const handleSavePost = useCallback(
+    async (postId: number) => {
+      try {
+        await savePostMutation.mutateAsync(postId);
+      } catch (error) {
+        console.error("Failed to save post", error);
+      }
+    },
+    [savePostMutation]
+  );
 
   useIntersectionObserver({
     target: triggerRef as any,
@@ -149,13 +150,6 @@ export default function Home() {
         {/* FEED CENTER */}
         <section className="md:col-span-1 lg:col-start-2 lg:col-end-3 w-full flex flex-col items-center">
           <div className="bg-white rounded-2xl shadow-lg p-5 mb-7 border border-gray-100 w-full max-w-2xl">
-            <div className="flex gap-5 overflow-x-auto pb-3 px-2">
-              {stories.map((s) => (
-                <Story key={s} name={s} />
-              ))}
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl shadow-lg p-5 mb-7 border border-gray-100 w-full max-w-2xl">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">
                 <img
@@ -186,7 +180,7 @@ export default function Home() {
               </div>
             ) : (
               allPosts?.data?.map((post) => (
-                <Post key={post.id} post={post} />
+                <Post key={post.id} post={post} onSavePost={handleSavePost} />
               ))
             )}
             {
@@ -221,32 +215,75 @@ export default function Home() {
                 <div className="text-base text-gray-600 font-semibold">
                   Suggested for you
                 </div>
-                <button className="text-xs text-indigo-500 hover:text-indigo-700 font-bold">
-                  See All
+                <button
+                  className="text-xs text-indigo-500 hover:text-indigo-700 font-bold"
+                  onClick={handleRecommendUser}
+                >
+                  Refresh
                 </button>
               </div>
-              <ul className="space-y-3">
-                {['anna', 'brian', 'carl'].map((s) => (
-                  <li key={s} className="flex items-center justify-between hover:bg-gray-50 rounded-xl transition p-2">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={`https://picsum.photos/seed/${s}/40`}
-                        className="w-10 h-10 rounded-full border border-gray-200"
-                        alt={s}
-                      />
-                      <div>
-                        <div className="text-sm font-semibold text-gray-800">
-                          {s}
+              <div className="space-y-3">
+                {isLoadingRecommend ? (
+                  <div className="space-y-2">
+                    {[...Array(3)].map((_, idx) => (
+                      <div key={idx} className="flex items-center justify-between animate-pulse">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gray-200" />
+                          <div className="space-y-1">
+                            <div className="h-3 w-24 bg-gray-200 rounded" />
+                            <div className="h-2 w-16 bg-gray-100 rounded" />
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-400">Suggested</div>
+                        <div className="h-6 w-16 bg-gray-100 rounded" />
                       </div>
-                    </div>
-                    <button className="text-xs px-4 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800 font-semibold rounded-lg shadow-xs transition border border-blue-100">
-                      Follow
+                    ))}
+                  </div>
+                ) : listRecommend.length > 0 ? (
+                  <ul className="space-y-3">
+                    {listRecommend.map((suggestion) => (
+                      <li
+                        key={suggestion.id ?? suggestion.username}
+                        className="flex items-center justify-between hover:bg-gray-50 rounded-xl transition p-2"
+                      >
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={
+                              suggestion.avatar ||
+                              `https://picsum.photos/seed/${suggestion.username}/40`
+                            }
+                            className="w-10 h-10 rounded-full border border-gray-200 object-cover"
+                            alt={suggestion.username}
+                          />
+                          <div>
+                            <div className="text-sm font-semibold text-gray-800">
+                              {suggestion.username}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {suggestion.displayname || "Suggested for you"}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleAddFollow(suggestion.username)}
+                          className="text-xs px-4 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800 font-semibold rounded-lg shadow-xs transition border border-blue-100"
+                        >
+                          Follow
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-sm text-gray-400 text-center py-3">
+                    No suggestions available right now.
+                    <button
+                      className="block w-full text-xs text-indigo-500 font-semibold mt-2 hover:text-indigo-700"
+                      onClick={handleRecommendUser}
+                    >
+                      Refresh suggestions
                     </button>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="text-xs text-gray-400 text-center pt-5">
               © InstaClone • About • Help

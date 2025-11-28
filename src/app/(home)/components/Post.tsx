@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 import { Heart, MessageCircle, Send, MoreHorizontal } from "lucide-react";
 import { PostModel } from "../../../types/post";
 import { formatDate } from "../../../lib/date";
@@ -14,7 +15,13 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 
-export default function Post({ post }: { post: PostModel }) {
+export default function Post({
+  post,
+  onSavePost,
+}: {
+  post: PostModel;
+  onSavePost?: (postId: number) => Promise<void> | void;
+}) {
   const hasMultiple = post.images.length > 1;
   const { isLiked, likeCount, handleClickLike } = useLike(post);
   const {
@@ -28,11 +35,44 @@ export default function Post({ post }: { post: PostModel }) {
     handleDeleteComment,
     setCommentInput,
   } = useComment(post);
+  const [showOptions, setShowOptions] = useState(false);
+  const [isSavingFavorite, setIsSavingFavorite] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowOptions(false);
+      }
+    };
+
+    if (showOptions) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showOptions]);
+
+  const handleAddFavorite = async () => {
+    if (!onSavePost || isSavingFavorite) return;
+
+    try {
+      setIsSavingFavorite(true);
+      await Promise.resolve(onSavePost(post.id));
+    } catch (error) {
+      console.error("Failed to save post", error);
+    } finally {
+      setIsSavingFavorite(false);
+      setShowOptions(false);
+    }
+  };
   return (
     <div>
       <article className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
-        <div className="flex items-center gap-3 p-4">
+        <div className="flex items-center gap-3 p-4 relative">
           <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
             <Link href={`/profile/${post.username}`}>
               <img
@@ -43,18 +83,64 @@ export default function Post({ post }: { post: PostModel }) {
             </Link>
           </div>
           <div className="flex-1">
-            <Link href={`/profile/${post.username}`}>
-              <div className="text-sm font-semibold text-gray-900">
-                {post.username}
-              </div>
-            </Link>
+            <div className="text-sm font-semibold text-gray-900">
+              <Link href={`/profile/${post.username}`}>
+                <span>
+                  {post.username}
+                </span>
+              </Link>
+            </div>
             <div className="text-xs text-gray-500">
               {formatDate(post.postTime)}
             </div>
           </div>
-          <button className="p-1 rounded-full hover:bg-gray-100 transition">
+          <button
+            className="p-1 rounded-full hover:bg-gray-100 transition"
+            onClick={() => setShowOptions((prev) => !prev)}
+          >
             <MoreHorizontal size={20} className="text-gray-600" />
           </button>
+          {showOptions && (
+            <div
+              ref={menuRef}
+              className="absolute top-12 right-4 w-60 rounded-2xl bg-[#1d1d1d] text-white shadow-2xl border border-gray-700 overflow-hidden z-20"
+            >
+              <div className="divide-y divide-gray-800">
+                {[
+                  { label: "Unfollow", variant: "danger" as const },
+                  {
+                    label: isSavingFavorite ? "Saving..." : "Add to favorites",
+                    isFavorite: true,
+                  },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    className={`w-full text-left px-4 py-3 text-sm font-medium ${item.variant === "danger" ? "text-red-400" : "text-gray-200"
+                      } hover:bg-[#2c2c2c] transition ${item.isFavorite && !onSavePost
+                        ? "opacity-60 cursor-not-allowed"
+                        : ""
+                      }`}
+                    disabled={item.isFavorite && (!onSavePost || isSavingFavorite)}
+                    onClick={() => {
+                      if (item.isFavorite) {
+                        handleAddFavorite();
+                      } else {
+                        setShowOptions(false);
+                      }
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+                <button
+                  className="w-full text-left px-4 py-3 text-sm font-medium text-gray-200 hover:bg-[#2c2c2c] transition"
+                  onClick={() => setShowOptions(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Image */}
@@ -137,11 +223,12 @@ export default function Post({ post }: { post: PostModel }) {
             className="text-xs text-gray-500 mb-3 cursor-pointer hover:text-gray-700 transition"
             onClick={() => handleShowComment()}
           >
-            {showComments
-              ? "Hide comments"
-              : commentCount == 0
-                ? ""
-                : `View all ${commentCount} comments`}
+            {
+              commentCount == 0
+                ? "" :
+                showComments
+                  ? "Hide comments"
+                  : `View all ${commentCount} comments`}
           </div>
 
           {showComments && comments && (

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Grid3X3,
   Bookmark,
@@ -51,12 +51,35 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
     "posts"
   );
-  const { postsByUserQuery } = usePost(username);
-  const { data: userPosts, isLoading: isUserLoading, isError: isUserError, refetch: refetchUser } = postsByUserQuery;
+  const { postsByUserQuery, savedPostsByUserQuery, savePostMutation } = usePost(username);
+  const {
+    data: userPosts,
+    isLoading: isUserLoading,
+    isError: isUserError,
+    refetch: refetchUser,
+  } = postsByUserQuery;
+  const {
+    data: savedPosts,
+    isLoading: isSavedLoading,
+    isError: isSavedError,
+    refetch: refetchSaved,
+  } = savedPostsByUserQuery;
   const safeUserPosts = userPosts ?? [];
+  const safeSavedPosts = savedPosts ?? [];
 
   const [showDialog, setShowDialog] = useState(false);
   const [selectedPost, setSelectedPost] = useState<PostModel | null>(null);
+
+  const handleSavePost = useCallback(
+    async (postId: number) => {
+      try {
+        await savePostMutation.mutateAsync(postId);
+      } catch (error) {
+        console.error("Failed to save post", error);
+      }
+    },
+    [savePostMutation]
+  );
 
   const stats = {
     posts: safeUserPosts.length,
@@ -228,21 +251,61 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             {/* Popup chi tiết post */}
             <Dialog open={showDialog} onOpenChange={setShowDialog}>
               <DialogContent className="overflow-auto max-h-[80vh]">
-                {selectedPost && <Post post={selectedPost} />}
+                {selectedPost && (
+                  <Post post={selectedPost} onSavePost={handleSavePost} />
+                )}
               </DialogContent>
             </Dialog>
           </>
         )}
 
         {activeTab === "saved" && (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-            <div className="w-16 h-16 border-2 border-gray-300 rounded-full flex items-center justify-center mb-4">
-              <Bookmark size={24} />
-            </div>
-            <h3 className="text-xl font-light mb-2">Saved Posts</h3>
-            <p className="text-sm">
-              Save photos and videos that you want to see again.
-            </p>
+          <div>
+            {isSavedLoading ? (
+              <div className="grid grid-cols-3 gap-1 md:gap-4 animate-pulse">
+                {[...Array(6)].map((_, idx) => (
+                  <div key={idx} className="aspect-square bg-gray-100 rounded-lg" />
+                ))}
+              </div>
+            ) : isSavedError ? (
+              <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+                <div className="w-16 h-16 border-2 border-gray-300 rounded-full flex items-center justify-center mb-4">
+                  <Bookmark size={24} />
+                </div>
+                <h3 className="text-xl font-light mb-2">Không thể tải danh sách đã lưu</h3>
+                <button
+                  onClick={() => refetchSaved()}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition"
+                >
+                  Thử lại
+                </button>
+              </div>
+            ) : safeSavedPosts.length > 0 ? (
+              <div className="grid grid-cols-3 gap-1 md:gap-4">
+                {safeSavedPosts.map((post) => (
+                  <div
+                    key={`saved-${post.id}`}
+                    onClick={() => {
+                      setSelectedPost(post);
+                      setShowDialog(true);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <ProfilePostItem post={post} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+                <div className="w-16 h-16 border-2 border-gray-300 rounded-full flex items-center justify-center mb-4">
+                  <Bookmark size={24} />
+                </div>
+                <h3 className="text-xl font-light mb-2">Chưa có bài viết đã lưu</h3>
+                <p className="text-sm text-center max-w-sm">
+                  Các bài viết bạn lưu sẽ xuất hiện tại đây. Hãy khám phá và lưu lại những nội dung bạn yêu thích.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
