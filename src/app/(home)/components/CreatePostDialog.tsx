@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useCreatePost } from "@/hooks/useCreatePost";
+import { buildFormData } from "@/lib/formdata";
 
 const MAX_IMAGES = 5;
 
@@ -94,11 +95,7 @@ export default function CreatePostDialog({ trigger }: CreatePostDialogProps) {
             return;
         }
         setError(null);
-        const formData = new FormData();
-        formData.append("content", caption.trim());
-        selectedFiles.forEach((file) => {
-            formData.append("images", file);
-        });
+        const formData = buildFormData({ content: caption.trim() }, selectedFiles);
         try {
             await submitPost(formData);
             setSuccessMessage("Bài viết đã được tạo thành công!");

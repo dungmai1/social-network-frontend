@@ -18,6 +18,6 @@ export interface UserProfileModel {
   id: number;
   username: string;
   avatar: string;
-  bio: string | null;
+  description: string | null;
   relationship: RelationshipModel;
 }

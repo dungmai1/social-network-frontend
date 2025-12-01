@@ -6,15 +6,20 @@ import {
   UserCheck,
   Settings,
   MoreHorizontal,
+  Copy,
+  Check,
+  Camera,
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import { usePost } from "@/hooks/usePost";
 import { useLike } from "@/hooks/useLike";
 import { useComment } from "@/hooks/useComment";
 import { PostModel } from "@/types/post";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Post from "@/app/(home)/components/Post";
 import useRelationship from "@/hooks/useRelationship";
+import Header from "@/app/(home)/components/Header";
+import QRCodeSVG from "react-qr-code";
 function ProfilePostItem({ post }: { post: PostModel }) {
   const { likeCount } = useLike(post);
   const { commentCount } = useComment(post);
@@ -69,6 +74,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
   const [showDialog, setShowDialog] = useState(false);
   const [selectedPost, setSelectedPost] = useState<PostModel | null>(null);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editValues, setEditValues] = useState({
+    displayName: userInfo?.username || "",
+    bio: userInfo?.description || ""
+  });
 
   const handleSavePost = useCallback(
     async (postId: number) => {
@@ -81,6 +93,20 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     [savePostMutation]
   );
 
+  const profileUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/profile/${username}`
+    : "";
+
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy link", error);
+    }
+  }, [profileUrl]);
+
   const stats = {
     posts: safeUserPosts.length,
     followers: userInfo?.relationship.followerCount ?? 0,
@@ -89,15 +115,49 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
   const tabs = [
     { id: "posts" as const, label: "Posts", icon: Grid3X3 },
-    { id: "saved" as const, label: "Saved", icon: Bookmark },
-    { id: "tagged" as const, label: "Tagged", icon: UserCheck },
+    ...(userInfo?.relationship.self
+      ? [{ id: "saved" as const, label: "Saved", icon: Bookmark }]
+      : []),
+    // { id: "tagged" as const, label: "Tagged", icon: UserCheck },
   ];
   useEffect(() => {
     getUserInfo(username);
-  }, [username])
+    setEditValues({
+      displayName: userInfo?.username || "",
+      bio: userInfo?.description || ""
+    })
+  }, [username]);
+
+  const handleEditProfile = useCallback(async () => {
+    try {
+      // await getUserInfo(username, {
+      //   displayName: editValues.displayName,
+      //   bio: editValues.bio,
+      //   website: editValues.website,
+      // });
+      setShowEditDialog(false);
+      refetchUser(); // Refetch user info to update the header
+    } catch (error) {
+      console.error("Failed to edit profile", error);
+    }
+  }, [username, editValues, getUserInfo, refetchUser]);
+
+  const handleAvatarChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Assuming userInfo is updated by getUserInfo, so we don't need to set it directly here
+        // setUserInfo(prev => ({ ...prev, avatar: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto bg-white min-h-screen">
       {/* Profile Header */}
+      <Header />
       <div className="px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Profile Picture */}
@@ -123,10 +183,16 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               <div className="flex gap-2">
                 {userInfo?.relationship.self ? (
                   <>
-                    <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                    <button
+                      className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition"
+                      onClick={() => setShowEditDialog(true)}
+                    >
                       Edit profile
                     </button>
-                    <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                    <button
+                      onClick={() => setShowShareDialog(true)}
+                      className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition"
+                    >
                       Share profile
                     </button>
                   </>
@@ -187,8 +253,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 {userInfo?.username || "Display Name"}
               </div>
               <div className="text-gray-900">
-                This is a sample bio for the Instagram-like profile page. You
-                can add your own bio content here.
+                {userInfo?.description || "No bio"}
               </div>
               <div className="text-blue-600 text-sm">
                 <a href="#" className="hover:underline">
@@ -321,6 +386,125 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           </div>
         )}
       </div>
+
+      {/* Share Profile Dialog */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent className="max-w-md">
+          <DialogTitle className="text-xl font-semibold text-center mb-4">
+            Share Profile
+          </DialogTitle>
+          <div className="flex flex-col items-center gap-6 py-4">
+            {/* QR Code */}
+            <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
+              {profileUrl && (
+                <QRCodeSVG
+                  value={profileUrl}
+                  size={200}
+                  level="H"
+                />
+              )}
+            </div>
+
+            {/* Profile Link */}
+            <div className="w-full">
+              <div className="text-sm text-gray-600 mb-2 text-center">
+                Profile Link
+              </div>
+              <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <input
+                  type="text"
+                  value={profileUrl}
+                  readOnly
+                  className="flex-1 bg-transparent text-sm text-gray-700 outline-none"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-md transition"
+                >
+                  {copied ? (
+                    <>
+                      <Check size={16} />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={16} />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="overflow-auto max-h-[80vh]">
+          <DialogTitle>Edit Profile</DialogTitle>
+          <form className="space-y-4">
+            {/* Avatar Upload */}
+            <div className="flex justify-center">
+              <div className="relative w-24 h-24">
+                <label htmlFor="avatar-upload" className="block">
+                  <img
+                    src={userInfo?.avatar || 'https://picsum.photos/seed/avatar/400/400'}
+                    alt="Avatar preview"
+                    className="rounded-full w-24 h-24 object-cover border"
+                  />
+                </label>
+                <Camera
+                  size={22}
+                  className="absolute bottom-0 right-0 text-gray-600 bg-white rounded-full p-1 border cursor-pointer"
+                />
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+              </div>
+            </div>
+            {/* Display Name */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Display Name</label>
+              <input
+                type="text"
+                className="w-full border rounded-md px-3 py-2"
+                value={editValues.displayName} // cần state editValues cho các giá trị
+                onChange={e => setEditValues(v => ({ ...v, displayName: e.target.value }))}
+              />
+            </div>
+            {/* Bio */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Bio</label>
+              <textarea
+                className="w-full border rounded-md px-3 py-2"
+                value={editValues.bio}
+                onChange={e => setEditValues(v => ({ ...v, bio: e.target.value }))}
+              />
+            </div>
+            <div className="pt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowEditDialog(false)}
+                className="px-4 py-2 rounded-md border"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                onClick={handleEditProfile}
+              >
+                Lưu
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
