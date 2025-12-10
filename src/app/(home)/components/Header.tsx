@@ -23,9 +23,11 @@ export default function Header() {
                     <button className="p-2 rounded-lg hover:bg-gray-100 transition">
                         <Heart size={20} className="text-gray-700" />
                     </button>
-                    <button className="p-2 rounded-lg hover:bg-gray-100 transition">
-                        <MessageCircle size={20} className="text-gray-700" />
-                    </button>
+                    <Link href="/CometChat" aria-label="Open CometChat">
+                        <div className="p-2 rounded-lg hover:bg-gray-100 transition">
+                            <MessageCircle size={20} className="text-gray-700" />
+                        </div>
+                    </Link>
                 </div>
             </div>
         </header>

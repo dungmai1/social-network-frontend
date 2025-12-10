@@ -37,16 +37,6 @@ export default function Home() {
     }),
     [allPostsPages]
   );
-  const stories = [
-    "you",
-    "alice",
-    "bob",
-    "charlie",
-    "david",
-    "eva",
-    "frank",
-    "gina",
-  ];
   const triggerRef = useRef(null);
 
   const handleIntersect = useCallback(() => {

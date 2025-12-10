@@ -7,6 +7,7 @@ export interface PostModel {
   avatar: string;
   status: string;
   images: string[];
+  saved: boolean;
 }
 
 export interface PostResponse {

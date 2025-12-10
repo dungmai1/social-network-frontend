@@ -36,7 +36,7 @@ export default function Post({
     setCommentInput,
   } = useComment(post);
   const [showOptions, setShowOptions] = useState(false);
-  const [isSavingFavorite, setIsSavingFavorite] = useState(false);
+  const [saved, setSaved] = useState(post.saved);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -56,15 +56,13 @@ export default function Post({
   }, [showOptions]);
 
   const handleAddFavorite = async () => {
-    if (!onSavePost || isSavingFavorite) return;
-
+    if (!onSavePost) return;
     try {
-      setIsSavingFavorite(true);
       await Promise.resolve(onSavePost(post.id));
+      setSaved((prev) => !prev);
     } catch (error) {
-      console.error("Failed to save post", error);
+      console.error("Failed to save/unsave post", error);
     } finally {
-      setIsSavingFavorite(false);
       setShowOptions(false);
     }
   };
@@ -107,26 +105,18 @@ export default function Post({
             >
               <div className="divide-y divide-gray-800">
                 {[
-                  { label: "Unfollow", variant: "danger" as const },
                   {
-                    label: isSavingFavorite ? "Saving..." : "Add to favorites",
-                    isFavorite: true,
+                    label: saved ? "Saved" : "Add to favorites",
+                    saved: saved,
                   },
                 ].map((item) => (
                   <button
                     key={item.label}
-                    className={`w-full text-left px-4 py-3 text-sm font-medium ${item.variant === "danger" ? "text-red-400" : "text-gray-200"
-                      } hover:bg-[#2c2c2c] transition ${item.isFavorite && !onSavePost
-                        ? "opacity-60 cursor-not-allowed"
-                        : ""
-                      }`}
-                    disabled={item.isFavorite && (!onSavePost || isSavingFavorite)}
+                    className={`w-full text-left px-4 py-3 text-sm font-medium text-gray-200
+                    hover:bg-[#2c2c2c] transition 
+                  `}
                     onClick={() => {
-                      if (item.isFavorite) {
-                        handleAddFavorite();
-                      } else {
-                        setShowOptions(false);
-                      }
+                      handleAddFavorite();
                     }}
                   >
                     {item.label}
