@@ -8,8 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@cometchat-pro/chat": "^3.0.10",
     "@cometchat/calls-sdk-javascript": "^4.2.1",
-    "@cometchat/chat-uikit-react": "^6.2.3",
+    "@cometchat/chat-uikit-react": "^6.3.5",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-visually-hidden": "^1.2.3",

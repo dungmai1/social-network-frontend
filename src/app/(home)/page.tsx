@@ -14,7 +14,7 @@ import Header from "./components/Header";
 
 export default function Home() {
   const { allPostsQuery, savePostMutation } = usePost();
-  const { user } = useUser();
+  const { userCurrent } = useUser();
   const {
     data: allPostsPages,
     isLoading: isAllLoading,
@@ -29,7 +29,7 @@ export default function Home() {
     isLoadingRecommend,
     handleRecommendUser,
     handleAddFollow,
-  } = useRelationship(user?.username ?? "");
+  } = useRelationship(userCurrent?.username ?? "");
 
   const allPosts = useMemo(
     () => ({
@@ -95,13 +95,13 @@ export default function Home() {
                 </button>
               }
             />
-            <Link href={`/profile/${user?.username}`}>
+            <Link href={`/profile/${userCurrent?.username}`}>
               <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
                 <div className="w-7 h-7 rounded-full overflow-hidden border border-gray-200">
                   <img
                     className="w-full h-full object-cover"
-                    src={user?.avatar}
-                    alt={user?.username || "User"}
+                    src={userCurrent?.avatar}
+                    alt={userCurrent?.username || "User"}
                   />
                 </div>
                 <span className="font-medium text-gray-800 text-base">Profile</span>
@@ -115,8 +115,8 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">
                 <img
-                  src={user?.avatar || `https://picsum.photos/seed/${user?.username || "create"}/80`}
-                  alt={user?.username || "User"}
+                  src={userCurrent?.avatar || `https://picsum.photos/seed/${userCurrent?.username || "create"}/80`}
+                  alt={userCurrent?.username || "User"}
                   className="h-full w-full object-cover"
                 />
               </div>

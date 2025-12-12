@@ -1,0 +1,63 @@
+/* Main container for the CometChat tab bar */
+.cometchat-tab-component {
+  display: flex; /* Align child tabs horizontally */
+  width: 100%; /* Full-width tab bar */
+  padding: 0px 8px; /* Horizontal padding */
+  align-items: flex-start; /* Align tab items to the top */
+  gap: 8px; /* Space between tab items */
+  border-top: 1px solid var(--cometchat-border-color-light, #f5f5f5); /* Top border */
+  border-right: 1px solid var(--cometchat-border-color-light, #f5f5f5); /* Right border */
+  background: var(--cometchat-background-color-01, #fff); /* Background color */
+}
+
+/* Styles for each individual tab */
+.cometchat-tab-component__tab {
+  display: flex;
+  flex-direction: column; /* Stack icon and text vertically */
+  justify-content: center; /* Center vertically */
+  align-items: center; /* Center horizontally */
+  padding: 12px 0px 10px 0px; /* Top and bottom spacing */
+  gap: 4px; /* Space between icon and text */
+  flex: 1 0 0; /* Equally distribute available space among tabs */
+  min-height: 48px; /* Minimum height for consistent layout */
+}
+
+/* Default tab icon style */
+.cometchat-tab-component__tab-icon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+  align-items: center;
+  background: var(
+    --cometchat-icon-color-secondary
+  ); /* Default icon background */
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  cursor: pointer;
+}
+
+/* Tab text label style */
+.cometchat-tab-component__tab-text {
+  color: var(
+    --cometchat-text-color-secondary,
+    #727272
+  ); /* Default label color */
+  text-align: center;
+  font: var(--cometchat-font-caption1-medium, 500 12px Roboto); /* Font style */
+  cursor: pointer;
+}
+
+/* Highlighted icon style for active/hovered tab */
+.cometchat-tab-component__tab-icon-active {
+  background: var(--cometchat-icon-color-highlight); /* Highlight color */
+}
+
+/* Highlighted text style for active/hovered tab */
+.cometchat-tab-component__tab-text-active {
+  color: var(--cometchat-text-color-highlight); /* Highlighted text color */
+}

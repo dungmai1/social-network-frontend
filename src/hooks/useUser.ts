@@ -4,13 +4,13 @@ import { UserModel, UserProfileModel } from "@/types/user";
 import { useEffect, useState } from "react";
 
 export default function useUser() {
-  const [user, setUser] = useState<UserModel | null>(null);
+  const [userCurrent, setUserCurrent] = useState<UserModel | null>(null);
   const [userInfo, setUserInfo] = useState<UserProfileModel | null>(null);
   useEffect(() => {
     const fetchData = async () => {
       const data = await getUser();
       if (data) {
-        setUser(data);
+        setUserCurrent(data);
       }
     };
     fetchData();
@@ -28,5 +28,5 @@ export default function useUser() {
       console.log("Error get user by user name");
     }
   };
-  return { user, handleLogout, getUserInfo, userInfo };
+  return { userCurrent, handleLogout, getUserInfo, userInfo };
 }

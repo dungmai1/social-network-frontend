@@ -11,8 +11,8 @@ import Link from "next/link";
 
 export default function Comment({ post, comment, onReply, onDelete }: { post: PostModel, comment: CommentModel, onReply: (username: string, commentId: number) => void, onDelete: (postId: number, commentId: number) => void }) {
     const { isLikeComment, likeCommentCount, handleAddLikeComment } = useCommentInfo(comment);
-    const { user } = useUser();
-    const canDelete = user?.username === comment.username || user?.username === post.username;
+    const { userCurrent } = useUser();
+    const canDelete = userCurrent?.username === comment.username || userCurrent?.username === post.username;
     return (
         <div>
             <div className="flex gap-3">
