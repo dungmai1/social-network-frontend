@@ -1,10 +1,21 @@
 "use client";
+import { useUserStore } from "@/hooks/useUserStore";
 import { login } from "@/services/auth.service";
-import React, { useState } from "react";
+import { CometChatUIKit, UIKitSettingsBuilder } from "@cometchat/chat-uikit-react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+
+const COMETCHAT_CONSTANTS = {
+  APP_ID: process.env.NEXT_PUBLIC_COMETCHAT_APP_ID ?? "",
+  REGION: process.env.NEXT_PUBLIC_COMETCHAT_REGION ?? "",
+  AUTH_KEY: process.env.NEXT_PUBLIC_COMETCHAT_AUTH_KEY ?? "",
+};
 
 export default function LoginPage() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const setUser = useUserStore.getState().setUser;
   const [error, setError] = useState("");
   const methods = useForm({
     defaultValues: {
@@ -12,6 +23,25 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    const initializeCometChat = async () => {
+      try {
+        const UIKitSettings = new UIKitSettingsBuilder()
+          .setAppId(COMETCHAT_CONSTANTS.APP_ID)
+          .setRegion(COMETCHAT_CONSTANTS.REGION)
+          .setAuthKey(COMETCHAT_CONSTANTS.AUTH_KEY)
+          .subscribePresenceForAllUsers()
+          .build();
+
+        await CometChatUIKit.init(UIKitSettings);
+        console.log("CometChat initialized successfully");
+      } catch (error) {
+        console.error("CometChat initialization failed:", error);
+      }
+    };
+    initializeCometChat();
+  }, []);
 
   const onSubmit = async (data: { username: string; password: string }) => {
     setError("");
@@ -23,11 +53,21 @@ export default function LoginPage() {
         return;
       }
       const res = await login(data.username, data.password);
-      if (!res.success) {
+      if (!res) {
         setError(res.message || "Đăng nhập thất bại!");
+        setIsLoading(false);
         return;
       }
       console.log("Đăng nhập thành công!");
+      try {
+        const user = await CometChatUIKit.login(data.username);
+        console.log("Login Successful", { user });
+        setUser(user);
+        router.push("/");
+      } catch (error) {
+        console.error("Login failed", error);
+        setError("CometChat login failed");
+      }
     } catch (e: any) {
       console.error("Lỗi đăng nhập:", e);
       setError(e.message || "Có lỗi xảy ra, vui lòng thử lại");

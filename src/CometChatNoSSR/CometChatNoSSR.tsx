@@ -10,6 +10,7 @@ import { CometChat } from "@cometchat/chat-sdk-javascript";
 import "./CometChatNoSSR.css";
 import { CometChatSelector } from "@/app/CometChatSelector/CometChatSelector";
 import useUser from "@/hooks/useUser";
+import { useUserStore } from "@/hooks/useUserStore";
 
 // Constants for CometChat configuration
 const COMETCHAT_CONSTANTS = {
@@ -18,52 +19,14 @@ const COMETCHAT_CONSTANTS = {
   AUTH_KEY: process.env.NEXT_PUBLIC_COMETCHAT_AUTH_KEY ?? "",
 };
 
-// Functional component for CometChatNoSSR
 const CometChatNoSSR: React.FC = () => {
-  // State to store the logged-in user
-  const [user, setUser] = useState<CometChat.User | undefined>(undefined);
-  // State to store selected user or group
-  const { userCurrent } = useUser();
+  const user = useUserStore((state) => state.user);
   const [selectedUser, setSelectedUser] = useState<CometChat.User | undefined>(
     undefined
   );
   const [selectedGroup, setSelectedGroup] = useState<
     CometChat.Group | undefined
   >(undefined);
-
-  useEffect(() => {
-    // Initialize UIKit settings
-    const UIKitSettings = new UIKitSettingsBuilder()
-      .setAppId(COMETCHAT_CONSTANTS.APP_ID)
-      .setRegion(COMETCHAT_CONSTANTS.REGION)
-      .setAuthKey(COMETCHAT_CONSTANTS.AUTH_KEY)
-      .subscribePresenceForAllUsers()
-      .build();
-
-    // Initialize CometChat UIKit
-    CometChatUIKit.init(UIKitSettings)
-      ?.then(() => {
-        console.log(
-          "Initialization completed successfully",
-          userCurrent?.username
-        );
-        CometChatUIKit.getLoggedinUser().then((loggedInUser) => {
-          if (!loggedInUser) {
-            // Perform login if no user is logged in
-            CometChatUIKit.login(userCurrent!.username)
-              .then((user) => {
-                console.log("Login Successful", { user });
-                setUser(user);
-              })
-              .catch((error) => console.error("Login failed", error));
-          } else {
-            console.log("Already logged-in", { loggedInUser });
-            setUser(loggedInUser);
-          }
-        });
-      })
-      .catch((error) => console.error("Initialization failed", error));
-  }, [userCurrent]);
 
   return user ? (
     <div className="conversations-with-messages">

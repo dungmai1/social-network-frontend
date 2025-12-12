@@ -12,7 +12,7 @@ export async function login(username: string, password: string) {
         throw new Error("Invalid credentials");
     } else {
         const data = await res.json();
-        window.location.href = "/"
+        // window.location.href = "/"
         return data;
     }
 }
@@ -26,4 +26,19 @@ export async function logout() {
         throw new Error("Failed to logout");
     }
     window.location.href = "/login";
+}
+export async function register(username: string, displayname:string, phone:string, password: string) {
+    const res = await fetch(`${URL_AUTH}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ username, displayname, phone ,password }),
+    })
+    if (!res.ok) {
+        throw new Error("Invalid credentials");
+    } else {
+        const data = await res.json();
+        window.location.href = "/login"
+        return data;
+    }
 }
