@@ -1,10 +1,18 @@
-import { addFollow, recommendUser } from "@/services/relationship.service";
+import {
+    addFollow,
+    recommendUser,
+    getFollower,
+    getFollowing,
+} from "@/services/relationship.service";
 import { UserModel } from "@/types/user";
 import { useCallback, useEffect, useState } from "react";
 
 export default function useRelationship(username?: string) {
     const [listRecommend, setListRecommend] = useState<UserModel[]>([]);
     const [isLoadingRecommend, setIsLoadingRecommend] = useState<boolean>(false);
+
+    const [followersList, setFollowersList] = useState<UserModel[]>([]);
+    const [followingsList, setFollowingsList] = useState<UserModel[]>([]);
 
     const handleAddFollow = async (targetUsername?: string) => {
         const usernameToFollow = targetUsername || username;
@@ -43,9 +51,52 @@ export default function useRelationship(username?: string) {
         }
     }, [username]);
 
+    const fetchFollowersAndFollowings = useCallback(async () => {
+        if (!username) {
+            setFollowersList([]);
+            setFollowingsList([]);
+            return;
+        }
+
+        try {
+            const [followersRes, followingsRes] = await Promise.all([
+                getFollower(username),
+                getFollowing(username),
+            ]);
+
+            const normalizedFollowers = Array.isArray(followersRes)
+                ? followersRes
+                : Array.isArray(followersRes?.data)
+                    ? followersRes.data
+                    : [];
+
+            const normalizedFollowings = Array.isArray(followingsRes)
+                ? followingsRes
+                : Array.isArray(followingsRes?.data)
+                    ? followingsRes.data
+                    : [];
+
+            setFollowersList(normalizedFollowers);
+            setFollowingsList(normalizedFollowings);
+        } catch (error) {
+            console.log("Error fetch followers/followings", error);
+        }
+    }, [username]);
+
     useEffect(() => {
         handleRecommendUser();
     }, [handleRecommendUser]);
 
-    return { handleAddFollow, listRecommend, isLoadingRecommend, handleRecommendUser };
+    useEffect(() => {
+        fetchFollowersAndFollowings();
+    }, [fetchFollowersAndFollowings]);
+
+    return {
+        handleAddFollow,
+        listRecommend,
+        isLoadingRecommend,
+        handleRecommendUser,
+        followersList,
+        followingsList,
+    };
 }

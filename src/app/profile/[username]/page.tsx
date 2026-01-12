@@ -49,14 +49,20 @@ function ProfilePostItem({ post }: { post: PostModel }) {
     </div>
   );
 }
-export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
+export default function ProfilePage({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
   const { username } = React.use(params);
   const { getUserInfo, userInfo } = useUser();
-  const { handleAddFollow } = useRelationship(username);
+  const { handleAddFollow, followersList, followingsList } =
+    useRelationship(username);
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
     "posts"
   );
-  const { postsByUserQuery, savedPostsByUserQuery, savePostMutation } = usePost(username);
+  const { postsByUserQuery, savedPostsByUserQuery, savePostMutation } =
+    usePost(username);
   const {
     data: userPosts,
     isLoading: isUserLoading,
@@ -79,8 +85,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editValues, setEditValues] = useState({
     displayName: userInfo?.username || "",
-    bio: userInfo?.description || ""
+    bio: userInfo?.description || "",
   });
+  const [showFollowersDialog, setShowFollowersDialog] = useState(false);
+  const [showFollowingsDialog, setShowFollowingsDialog] = useState(false);
 
   const handleSavePost = useCallback(
     async (postId: number) => {
@@ -93,9 +101,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     [savePostMutation]
   );
 
-  const profileUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/profile/${username}`
-    : "";
+  const profileUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/profile/${username}`
+      : "";
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -118,14 +127,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     ...(userInfo?.relationship.self
       ? [{ id: "saved" as const, label: "Saved", icon: Bookmark }]
       : []),
-    // { id: "tagged" as const, label: "Tagged", icon: UserCheck },
   ];
   useEffect(() => {
     getUserInfo(username);
     setEditValues({
       displayName: userInfo?.username || "",
-      bio: userInfo?.description || ""
-    })
+      bio: userInfo?.description || "",
+    });
+    console.log(followersList);
   }, [username]);
 
   const handleEditProfile = useCallback(async () => {
@@ -142,17 +151,18 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     }
   }, [username, editValues, getUserInfo, refetchUser]);
 
-  const handleAvatarChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Assuming userInfo is updated by getUserInfo, so we don't need to set it directly here
-        // setUserInfo(prev => ({ ...prev, avatar: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
-    }
-  }, []);
+  const handleAvatarChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    []
+  );
 
   return (
     <div className="max-w-4xl mx-auto bg-white min-h-screen">
@@ -165,7 +175,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-2 border-gray-200">
               <img
                 src={
-                  userInfo?.avatar || "https://picsum.photos/seed/avatar/400/400"
+                  userInfo?.avatar ||
+                  "https://picsum.photos/seed/avatar/400/400"
                 }
                 alt={userInfo?.username || "Profile"}
                 className="w-full h-full object-cover"
@@ -196,26 +207,32 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                       Share profile
                     </button>
                   </>
-                ) :
-                  (
-                    <>
-                      {
-                        userInfo?.relationship.following ? (
-                          <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
-                            Following
-                          </button>
-                        ) :
-                          (
-                            <button onClick={() => handleAddFollow()} className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
-                              Follow
-                            </button>
-                          )
-                      }
-                      <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
-                        Message
+                ) : (
+                  <>
+                    {userInfo?.relationship.following ? (
+                      <button
+                        onClick={() =>
+                          handleAddFollow().then(() => getUserInfo(username))
+                        }
+                        className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition"
+                      >
+                        Following
                       </button>
-                    </>
-                  )}
+                    ) : (
+                      <button
+                        onClick={() =>
+                          handleAddFollow().then(() => getUserInfo(username))
+                        }
+                        className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition"
+                      >
+                        Follow
+                      </button>
+                    )}
+                    <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                      Message
+                    </button>
+                  </>
+                )}
                 <button className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-md transition">
                   <Settings size={16} />
                 </button>
@@ -233,18 +250,26 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 </span>
                 <span className="text-gray-600 ml-1">posts</span>
               </div>
-              <div>
+              <button
+                type="button"
+                onClick={() => setShowFollowersDialog(true)}
+                className="flex items-center focus:outline-none"
+              >
                 <span className="font-semibold text-gray-900">
                   {stats.followers}
                 </span>
                 <span className="text-gray-600 ml-1">followers</span>
-              </div>
-              <div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowFollowingsDialog(true)}
+                className="flex items-center focus:outline-none"
+              >
                 <span className="font-semibold text-gray-900">
                   {stats.following}
                 </span>
                 <span className="text-gray-600 ml-1">following</span>
-              </div>
+              </button>
             </div>
 
             {/* Bio */}
@@ -296,7 +321,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             <div className="grid grid-cols-3 gap-1 md:gap-4">
               {safeUserPosts.length > 0 ? (
                 safeUserPosts.map((post) => (
-                  <div key={post.id} onClick={() => { setSelectedPost(post); setShowDialog(true) }}>
+                  <div
+                    key={post.id}
+                    onClick={() => {
+                      setSelectedPost(post);
+                      setShowDialog(true);
+                    }}
+                  >
                     <ProfilePostItem post={post} />
                   </div>
                 ))
@@ -329,7 +360,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             {isSavedLoading ? (
               <div className="grid grid-cols-3 gap-1 md:gap-4 animate-pulse">
                 {[...Array(6)].map((_, idx) => (
-                  <div key={idx} className="aspect-square bg-gray-100 rounded-lg" />
+                  <div
+                    key={idx}
+                    className="aspect-square bg-gray-100 rounded-lg"
+                  />
                 ))}
               </div>
             ) : isSavedError ? (
@@ -337,7 +371,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 <div className="w-16 h-16 border-2 border-gray-300 rounded-full flex items-center justify-center mb-4">
                   <Bookmark size={24} />
                 </div>
-                <h3 className="text-xl font-light mb-2">Không thể tải danh sách đã lưu</h3>
+                <h3 className="text-xl font-light mb-2">
+                  Không thể tải danh sách đã lưu
+                </h3>
                 <button
                   onClick={() => refetchSaved()}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition"
@@ -365,9 +401,12 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 <div className="w-16 h-16 border-2 border-gray-300 rounded-full flex items-center justify-center mb-4">
                   <Bookmark size={24} />
                 </div>
-                <h3 className="text-xl font-light mb-2">Chưa có bài viết đã lưu</h3>
+                <h3 className="text-xl font-light mb-2">
+                  Chưa có bài viết đã lưu
+                </h3>
                 <p className="text-sm text-center max-w-sm">
-                  Các bài viết bạn lưu sẽ xuất hiện tại đây. Hãy khám phá và lưu lại những nội dung bạn yêu thích.
+                  Các bài viết bạn lưu sẽ xuất hiện tại đây. Hãy khám phá và lưu
+                  lại những nội dung bạn yêu thích.
                 </p>
               </div>
             )}
@@ -397,11 +436,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             {/* QR Code */}
             <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
               {profileUrl && (
-                <QRCodeSVG
-                  value={profileUrl}
-                  size={200}
-                  level="H"
-                />
+                <QRCodeSVG value={profileUrl} size={200} level="H" />
               )}
             </div>
 
@@ -439,6 +474,108 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         </DialogContent>
       </Dialog>
 
+      {/* Followers Dialog */}
+      <Dialog open={showFollowersDialog} onOpenChange={setShowFollowersDialog}>
+        <DialogContent className="max-w-md">
+          <DialogTitle className="text-lg font-semibold mb-4">
+            Followers
+          </DialogTitle>
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {followersList.length === 0 ? (
+              <p className="text-sm text-gray-500">No followers yet.</p>
+            ) : (
+              followersList.map((follower: any) => (
+                <div
+                  key={follower.id || follower.username}
+                  className="flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={
+                        follower.avatar ||
+                        "https://picsum.photos/seed/avatar/100/100"
+                      }
+                      alt={follower.username}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <span className="text-sm font-medium text-gray-900">
+                      {follower.username}
+                    </span>
+                  </div>
+                  {
+                    userInfo?.relationship.self ?
+                      <button
+                        type="button"
+                        className="px-3 py-1 text-xs font-medium text-red-600 border border-red-200 rounded-md hover:bg-red-50"
+                        onClick={() => {
+                          handleAddFollow(follower.username).then(() =>
+                            getUserInfo(username)
+                          );
+                        }}
+                      >
+                        Remove
+                      </button>
+                      : <></>
+                  }
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Followings Dialog */}
+      <Dialog
+        open={showFollowingsDialog}
+        onOpenChange={setShowFollowingsDialog}
+      >
+        <DialogContent className="max-w-md">
+          <DialogTitle className="text-lg font-semibold mb-4">
+            Following
+          </DialogTitle>
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {followingsList.length === 0 ? (
+              <p className="text-sm text-gray-500">Not following anyone yet.</p>
+            ) : (
+              followingsList.map((user: any) => (
+                <div
+                  key={user.id || user.username}
+                  className="flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={
+                        user.avatar || "https://picsum.photos/seed/avatar/100/100"
+                      }
+                      alt={user.username}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <span className="text-sm font-medium text-gray-900">
+                      {user.username}
+                    </span>
+                  </div>
+                  {
+                    userInfo?.relationship.self ?
+                      <button
+                        type="button"
+                        className="px-3 py-1 text-xs font-medium text-gray-900 border border-gray-200 rounded-md hover:bg-gray-50"
+                        onClick={() => {
+                          handleAddFollow(user.username).then(() =>
+                            getUserInfo(username)
+                          );
+                        }}
+                      >
+                        Following
+                      </button>
+                      : <></>
+                  }
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Profile Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="overflow-auto max-h-[80vh]">
@@ -449,7 +586,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               <div className="relative w-24 h-24">
                 <label htmlFor="avatar-upload" className="block">
                   <img
-                    src={userInfo?.avatar || 'https://picsum.photos/seed/avatar/400/400'}
+                    src={
+                      userInfo?.avatar ||
+                      "https://picsum.photos/seed/avatar/400/400"
+                    }
                     alt="Avatar preview"
                     className="rounded-full w-24 h-24 object-cover border"
                   />
@@ -469,12 +609,16 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             </div>
             {/* Display Name */}
             <div>
-              <label className="block text-sm font-medium mb-1">Display Name</label>
+              <label className="block text-sm font-medium mb-1">
+                Display Name
+              </label>
               <input
                 type="text"
                 className="w-full border rounded-md px-3 py-2"
                 value={editValues.displayName} // cần state editValues cho các giá trị
-                onChange={e => setEditValues(v => ({ ...v, displayName: e.target.value }))}
+                onChange={(e) =>
+                  setEditValues((v) => ({ ...v, displayName: e.target.value }))
+                }
               />
             </div>
             {/* Bio */}
@@ -483,7 +627,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               <textarea
                 className="w-full border rounded-md px-3 py-2"
                 value={editValues.bio}
-                onChange={e => setEditValues(v => ({ ...v, bio: e.target.value }))}
+                onChange={(e) =>
+                  setEditValues((v) => ({ ...v, bio: e.target.value }))
+                }
               />
             </div>
             <div className="pt-2 flex justify-end gap-2">
