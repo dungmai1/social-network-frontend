@@ -15,7 +15,7 @@ export async function getAllPost(cursor: string) {
     return data;
   } catch (error) {
     console.error("Error fetching posts:", error);
-    throw error; 
+    throw error;
   }
 }
 
@@ -112,19 +112,23 @@ export async function deletePost(postId: number) {
   }
 }
 
-export async function updatePost(postId: number, formData: FormData) {
+export async function updatePost(postId: number, content: string) {
   if (!postId) {
     throw new Error("Post ID is required");
   }
   try {
-    const res = await apiFetch(`${URL_BASE}/update?postId=${postId}`, {
+    const res = await apiFetch(`${URL_BASE}/updatePost?postId=${postId}`, {
       method: "PUT",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ content }),
     });
     if (!res.ok) {
       throw new Error(`Failed to update post: ${res.status}`);
     }
     const data: PostModel = await res.json();
+    console.log("Update post API response:", data);
     return data;
   } catch (error) {
     console.error("Error updating post:", error);

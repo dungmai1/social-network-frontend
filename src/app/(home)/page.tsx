@@ -132,7 +132,6 @@ export default function Home() {
                 }
               />
             </div>
-            <p className="mt-3 text-xs text-gray-400">Bạn có thể tải lên tối đa 5 ảnh cho mỗi bài viết.</p>
           </div>
           <div className="w-full max-w-2xl space-y-3">
             {isAllLoading ? (
@@ -142,7 +141,8 @@ export default function Home() {
               </div>
             ) : (
               allPosts?.data?.map((post) => (
-                <Post key={post.id} post={post} onSavePost={handleSavePost} />
+                <Post key={post.id} post={post} onSavePost={handleSavePost} 
+                />
               ))
             )}
             {

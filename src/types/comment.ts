@@ -6,4 +6,5 @@ export interface CommentModel {
   userAvatar: string;
   imageUrl: string;
   commentTime: string;
+  parentId: number;
 }
