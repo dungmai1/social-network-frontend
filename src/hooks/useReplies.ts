@@ -55,6 +55,24 @@ export default function useReplies(commentId: number) {
     setReplies((prev) => prev.filter((reply) => reply.id !== replyId));
     setRepliesCount((c) => (c > 0 ? c - 1 : 0));
   }, []);
+
+  // Hàm cập nhật reply sau khi edit
+  const handleEditReply = useCallback(
+    (replyId: number, newContent: string, newImageUrl?: string) => {
+      setReplies((prev) =>
+        prev.map((reply) =>
+          reply.id === replyId
+            ? {
+                ...reply,
+                content: newContent,
+                imageUrl: newImageUrl || reply.imageUrl,
+              }
+            : reply,
+        ),
+      );
+    },
+    [],
+  );
   useEffect(() => {
     handleGetCountRepliesComment(commentId);
   }, [commentId]);
@@ -74,6 +92,7 @@ export default function useReplies(commentId: number) {
     handleGetAllRepliesComment,
     handleAddLikeComment,
     handleDeleteReply,
+    handleEditReply,
     setReplies,
   };
 }

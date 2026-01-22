@@ -40,6 +40,7 @@ export default function Post({
     handleClickReply,
     handleAddComment,
     handleDeleteComment,
+    handleEditComment,
     setCommentInput,
   } = useComment(post);
   const [showOptions, setShowOptions] = useState(false);
@@ -164,57 +165,6 @@ export default function Post({
 
       {!isDeleted && (
         <>
-          {isEditing && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 w-96 shadow-2xl">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Edit Post
-                  </h2>
-                  <button
-                    onClick={handleCancelEdit}
-                    className="p-1 hover:bg-gray-100 rounded-full transition"
-                    disabled={isLoading}
-                  >
-                    <X size={20} className="text-gray-600" />
-                  </button>
-                </div>
-
-                {error && (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-4 text-sm">
-                    {error}
-                  </div>
-                )}
-
-                <textarea
-                  value={editedContent}
-                  onChange={(e) => setEditedContent(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg p-3 mb-4 outline-none focus:border-blue-500 resize-none"
-                  rows={5}
-                  placeholder="What's on your mind?"
-                  disabled={isLoading}
-                />
-
-                <div className="flex gap-2 justify-end">
-                  <button
-                    onClick={handleCancelEdit}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
-                    disabled={isLoading}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveEdit}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           <article className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
             {/* Header */}
             <div className="flex items-center gap-3 p-4 relative">
@@ -359,9 +309,56 @@ export default function Post({
                     {currentPost.username}
                   </span>
                 </Link>
-                <span className="text-gray-700">
-                  {currentPost.content || ""}
-                </span>
+                {isEditing ? (
+                  <div className="mt-2">
+                    {error && (
+                      <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-2 text-sm">
+                        {error}
+                      </div>
+                    )}
+                    <textarea
+                      value={editedContent}
+                      onChange={(e) => setEditedContent(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSaveEdit();
+                        }
+                        if (e.key === "Escape") {
+                          handleCancelEdit();
+                        }
+                      }}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      rows={3}
+                      autoFocus
+                      disabled={isLoading}
+                      placeholder="What's on your mind?"
+                    />
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={handleCancelEdit}
+                        disabled={isLoading}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleSaveEdit}
+                        disabled={isLoading || !editedContent.trim()}
+                        className="text-xs text-blue-500 font-semibold hover:text-blue-700 disabled:opacity-50"
+                      >
+                        {isLoading ? "Saving..." : "Save"}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Press Enter to save • Esc to cancel
+                    </p>
+                  </div>
+                ) : (
+                  <span className="text-gray-700">
+                    {currentPost.content || ""}
+                  </span>
+                )}
               </div>
 
               {/* Comments */}
@@ -385,6 +382,7 @@ export default function Post({
                       comment={comment}
                       onReply={handleClickReply}
                       onDelete={handleDeleteComment}
+                      onEdit={handleEditComment}
                     />
                   ))}
                 </div>

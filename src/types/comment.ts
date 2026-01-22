@@ -18,3 +18,10 @@ export interface RepliesRequest {
   content: string;
   // imageUrl: String;
 }
+
+export interface EditCommentRequest {
+  postId: number;
+  commentId: number;
+  content: string;
+  imageUrl?: string;
+}

@@ -18,7 +18,7 @@ import { usePost } from "@/hooks/usePost";
 import useUser from "@/hooks/useUser";
 import Link from "next/link";
 import useIntersectionObserver from "@/hooks/useIntersectionObserver";
-import CreatePostDialog from "@/components/post/CreatePostDialog";
+import CreatePostInline from "@/components/post/CreatePostInline";
 import useRelationship from "@/hooks/useRelationship";
 import Header from "@/components/layout/Header";
 
@@ -110,22 +110,25 @@ export default function Home() {
                 Message
               </span>
             </div>
-            <CreatePostDialog
-              trigger={
-                <button
-                  type="button"
-                  className="flex w-full items-center gap-3 rounded-xl bg-white p-3 transition hover:bg-gray-50 hover:shadow-lg group"
-                >
-                  <Plus
-                    size={22}
-                    className="text-emerald-600 transition group-hover:scale-110"
-                  />
-                  <span className="text-base font-medium text-gray-800">
-                    Create
-                  </span>
-                </button>
-              }
-            />
+            <a
+              href="#create-post"
+              className="flex w-full items-center gap-3 rounded-xl bg-white p-3 transition hover:bg-gray-50 hover:shadow-lg group"
+              onClick={(e) => {
+                e.preventDefault();
+                document
+                  .getElementById("create-post")
+                  ?.scrollIntoView({ behavior: "smooth" });
+                document.getElementById("create-post-input")?.focus();
+              }}
+            >
+              <Plus
+                size={22}
+                className="text-emerald-600 transition group-hover:scale-110"
+              />
+              <span className="text-base font-medium text-gray-800">
+                Create
+              </span>
+            </a>
             <Link href={`/profile/${userCurrent?.username}`}>
               <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
                 <div className="w-7 h-7 rounded-full overflow-hidden border border-gray-200">
@@ -144,32 +147,11 @@ export default function Home() {
         </aside>
         {/* FEED CENTER */}
         <section className="md:col-span-1 lg:col-start-2 lg:col-end-3 w-full flex flex-col items-center">
-          <div className="bg-white rounded-2xl shadow-lg p-5 mb-7 border border-gray-100 w-full max-w-2xl">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">
-                <img
-                  src={
-                    userCurrent?.avatar ||
-                    `https://picsum.photos/seed/${userCurrent?.username || "create"}/80`
-                  }
-                  alt={userCurrent?.username || "User"}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <CreatePostDialog
-                trigger={
-                  <button
-                    type="button"
-                    className="flex flex-1 items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 text-left text-sm text-gray-600 transition hover:border-gray-300 hover:bg-gray-50"
-                  >
-                    <span className="font-medium text-gray-700">
-                      Chia sẻ điều gì đó...
-                    </span>
-                    <Plus size={18} className="text-emerald-600" />
-                  </button>
-                }
-              />
-            </div>
+          <div id="create-post" className="w-full max-w-2xl mb-7">
+            <CreatePostInline
+              userAvatar={userCurrent?.avatar}
+              username={userCurrent?.username}
+            />
           </div>
           <div className="w-full max-w-2xl space-y-3">
             {isAllLoading ? (

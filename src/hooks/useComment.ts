@@ -2,6 +2,7 @@ import {
   addComment,
   addReplies,
   deleteComment,
+  editComment,
   getAllComment,
   getCountComments,
   getCountRepliesComments,
@@ -82,6 +83,29 @@ export function useComment(post: PostModel) {
       console.log("Erorr delete comment: ", error);
     }
   };
+
+  const handleEditComment = async (
+    postId: number,
+    commentId: number,
+    content: string,
+    imageUrl?: string,
+  ) => {
+    try {
+      const res = await editComment({ postId, commentId, content, imageUrl });
+      if (!res) return false;
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === commentId
+            ? { ...c, content: res.content, imageUrl: res.imageUrl }
+            : c,
+        ),
+      );
+      return true;
+    } catch (error) {
+      console.log("Error editing comment: ", error);
+      return false;
+    }
+  };
   useEffect(() => {
     handleCountComment();
   }, []);
@@ -95,6 +119,7 @@ export function useComment(post: PostModel) {
     handleClickReply,
     handleAddComment,
     handleDeleteComment,
+    handleEditComment,
     setCommentInput,
   };
 }
