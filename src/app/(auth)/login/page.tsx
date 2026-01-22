@@ -1,7 +1,10 @@
 "use client";
 import { useUserStore } from "@/hooks/useUserStore";
 import { login } from "@/services/auth.service";
-import { CometChatUIKit, UIKitSettingsBuilder } from "@cometchat/chat-uikit-react";
+import {
+  CometChatUIKit,
+  UIKitSettingsBuilder,
+} from "@cometchat/chat-uikit-react";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";

@@ -8,9 +8,9 @@ import {
 } from "@cometchat/chat-uikit-react";
 import { CometChat } from "@cometchat/chat-sdk-javascript";
 import "./CometChatNoSSR.css";
-import { CometChatSelector } from "@/app/CometChatSelector/CometChatSelector";
-import useUser from "@/hooks/useUser";
+import { CometChatSelector } from "@/CometChat/CometChatSelector/CometChatSelector";
 import { useUserStore } from "@/hooks/useUserStore";
+import useUser from "@/hooks/useUser";
 
 // Constants for CometChat configuration
 const COMETCHAT_CONSTANTS = {
@@ -18,16 +18,47 @@ const COMETCHAT_CONSTANTS = {
   REGION: process.env.NEXT_PUBLIC_COMETCHAT_REGION ?? "",
   AUTH_KEY: process.env.NEXT_PUBLIC_COMETCHAT_AUTH_KEY ?? "",
 };
-
-const CometChatNoSSR: React.FC = () => {
+interface CometChatNoSSRProps {
+  initialUsername?: string;
+}
+const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
   const user = useUserStore((state) => state.user);
+  const { userCurrent } = useUser();
   const [selectedUser, setSelectedUser] = useState<CometChat.User | undefined>(
-    undefined
+    undefined,
   );
+  const setUser = useUserStore.getState().setUser;
   const [selectedGroup, setSelectedGroup] = useState<
     CometChat.Group | undefined
   >(undefined);
-
+  useEffect(() => {
+    const initializeCometChat = async () => {
+      try {
+        const UIKitSettings = new UIKitSettingsBuilder()
+          .setAppId(COMETCHAT_CONSTANTS.APP_ID)
+          .setRegion(COMETCHAT_CONSTANTS.REGION)
+          .setAuthKey(COMETCHAT_CONSTANTS.AUTH_KEY)
+          .subscribePresenceForAllUsers()
+          .build();
+        await CometChatUIKit.init(UIKitSettings);
+        const user = await CometChatUIKit.login(userCurrent!.username);
+        console.log("Login Successful", { user });
+        setUser(user);
+        console.log("CometChat initialized successfully");
+      } catch (error) {
+        console.error("CometChat initialization failed:", error);
+      }
+    };
+    if (!user) {
+      initializeCometChat();
+    }
+    if (initialUsername) {
+      CometChat.getUser(initialUsername).then((user) => {
+        setSelectedUser(user);
+        setSelectedGroup(undefined);
+      });
+    }
+  }, [user, userCurrent]);
   return user ? (
     <div className="conversations-with-messages">
       {/* Sidebar with conversation list */}
@@ -42,7 +73,9 @@ const CometChatNoSSR: React.FC = () => {
             // Update states based on the type of selected item
             if (item instanceof CometChat.User) {
               setSelectedUser(item as CometChat.User);
+              console.log("item", item);
               setSelectedGroup(undefined);
+              window.history.pushState(null, "", `/message/${item.getUid()}`);
             } else if (item instanceof CometChat.Group) {
               setSelectedUser(undefined);
               setSelectedGroup(item as CometChat.Group);

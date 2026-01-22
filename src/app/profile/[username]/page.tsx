@@ -17,10 +17,11 @@ import { useLike } from "@/hooks/useLike";
 import { useComment } from "@/hooks/useComment";
 import { PostModel } from "@/types/post";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import Post from "@/app/(home)/components/Post";
+import Post from "@/components/post/Post";
 import useRelationship from "@/hooks/useRelationship";
-import Header from "@/app/(home)/components/Header";
+import Header from "@/components/layout/Header";
 import QRCodeSVG from "react-qr-code";
+import Link from "next/link";
 function ProfilePostItem({ post }: { post: PostModel }) {
   const { isLiked, likeCount } = useLike(post);
   const { commentCount } = useComment(post);
@@ -63,7 +64,7 @@ export default function ProfilePage({
   const { handleAddFollow, followersList, followingsList } =
     useRelationship(username);
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
-    "posts"
+    "posts",
   );
   const { postsByUserQuery, savedPostsByUserQuery, savePostMutation } =
     usePost(username);
@@ -102,7 +103,7 @@ export default function ProfilePage({
         console.error("Failed to save post", error);
       }
     },
-    [savePostMutation]
+    [savePostMutation],
   );
 
   const profileUrl =
@@ -164,7 +165,7 @@ export default function ProfilePage({
         reader.readAsDataURL(file);
       }
     },
-    []
+    [],
   );
 
   return (
@@ -231,9 +232,11 @@ export default function ProfilePage({
                         Follow
                       </button>
                     )}
-                    <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
-                      Message
-                    </button>
+                    <Link href={`/message/${username}`}>
+                      <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium text-sm rounded-md transition">
+                        Message
+                      </button>
+                    </Link>
                   </>
                 )}
                 <button className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-md transition">
@@ -512,7 +515,7 @@ export default function ProfilePage({
                       className="px-3 py-1 text-xs font-medium text-red-600 border border-red-200 rounded-md hover:bg-red-50"
                       onClick={() => {
                         handleAddFollow(follower.username).then(() =>
-                          getUserInfo(username)
+                          getUserInfo(username),
                         );
                       }}
                     >
@@ -565,7 +568,7 @@ export default function ProfilePage({
                       className="px-3 py-1 text-xs font-medium text-gray-900 border border-gray-200 rounded-md hover:bg-gray-50"
                       onClick={() => {
                         handleAddFollow(user.username).then(() =>
-                          getUserInfo(username)
+                          getUserInfo(username),
                         );
                       }}
                     >

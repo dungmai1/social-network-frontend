@@ -15,7 +15,7 @@ import {
   CometChatUIKitLoginListener,
   CometChatUsers
 } from "@cometchat/chat-uikit-react";
-import { CometChatTabs } from "@/CometChatTabs/CometChatTabs";
+import { CometChatTabs } from "@/CometChat/CometChatTabs/CometChatTabs";
 
 // Define props interface for selector
 interface SelectorProps {

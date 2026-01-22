@@ -1,4 +1,3 @@
-// types/user.ts
 export interface PostModel {
   id: number;
   content: string;

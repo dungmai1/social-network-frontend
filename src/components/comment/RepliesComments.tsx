@@ -1,5 +1,5 @@
 import { Heart } from "lucide-react";
-import { formatDate } from "../../../lib/date";
+import { formatDate } from "@/lib/date";
 import useReplies from "@/hooks/useReplies";
 import { useCommentInfo } from "@/hooks/useCommentInfo";
 import DeleteDialog from "@/components/comment/DeleteDialog";

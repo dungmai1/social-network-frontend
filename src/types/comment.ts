@@ -8,3 +8,13 @@ export interface CommentModel {
   commentTime: string;
   parentId: number;
 }
+export interface CommentRequest {
+  postId: number;
+  contentCmt: string;
+  // imageUrl: String;
+}
+export interface RepliesRequest {
+  commentId: number;
+  content: string;
+  // imageUrl: String;
+}

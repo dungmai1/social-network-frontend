@@ -1,18 +1,8 @@
 import { apiFetch } from "../lib/api";
-import { CommentModel } from "../types/comment";
+import { CommentModel, CommentRequest, RepliesRequest } from "../types/comment";
 
 const URL_BASE = "/comments"
 
-export interface CommentRequest {
-  postId: number;
-  contentCmt: string;
-  // imageUrl: String;
-}
-export interface RepliesRequest {
-  commentId: number;
-  content: string;
-  // imageUrl: String;
-}
 export async function getAllComment(postId: number) {
   const res = await apiFetch(`${URL_BASE}/posts?postId=${postId}`, { method: "GET" });
   if (!res.ok) {

@@ -1,16 +1,26 @@
 "use client";
 
 import React, { useCallback, useMemo, useRef } from "react";
-import { Heart, MessageCircle, Search, Clapperboard, Home as HomeIcon, Compass, User, Film, Plus } from "lucide-react";
-import Avatar from "./components/Avatar";
-import Post from "./components/Post";
+import {
+  Heart,
+  MessageCircle,
+  Search,
+  Clapperboard,
+  Home as HomeIcon,
+  Compass,
+  User,
+  Film,
+  Plus,
+} from "lucide-react";
+import Avatar from "@/components/common/Avatar";
+import Post from "@/components/post/Post";
 import { usePost } from "@/hooks/usePost";
 import useUser from "@/hooks/useUser";
 import Link from "next/link";
 import useIntersectionObserver from "@/hooks/useIntersectionObserver";
-import CreatePostDialog from "./components/CreatePostDialog";
+import CreatePostDialog from "@/components/post/CreatePostDialog";
 import useRelationship from "@/hooks/useRelationship";
-import Header from "./components/Header";
+import Header from "@/components/layout/Header";
 
 export default function Home() {
   const { allPostsQuery, savePostMutation } = usePost();
@@ -35,7 +45,7 @@ export default function Home() {
     () => ({
       data: allPostsPages?.pages?.flatMap((page) => page?.data ?? []) ?? [],
     }),
-    [allPostsPages]
+    [allPostsPages],
   );
   const triggerRef = useRef(null);
 
@@ -52,7 +62,7 @@ export default function Home() {
         console.error("Failed to save post", error);
       }
     },
-    [savePostMutation]
+    [savePostMutation],
   );
 
   useIntersectionObserver({
@@ -69,20 +79,36 @@ export default function Home() {
         <aside className="hidden md:block w-[200px] pt-2">
           <nav className="sticky top-28 space-y-2">
             <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <HomeIcon size={22} className="text-indigo-600 group-hover:scale-110 transition" />
+              <HomeIcon
+                size={22}
+                className="text-indigo-600 group-hover:scale-110 transition"
+              />
               <span className="font-medium text-gray-800 text-base">Home</span>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <Compass size={22} className="text-pink-500 group-hover:scale-110 transition" />
-              <span className="font-medium text-gray-800 text-base">Explore</span>
+              <Compass
+                size={22}
+                className="text-pink-500 group-hover:scale-110 transition"
+              />
+              <span className="font-medium text-gray-800 text-base">
+                Explore
+              </span>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <Clapperboard size={22} className="text-teal-600 group-hover:scale-110 transition" />
+              <Clapperboard
+                size={22}
+                className="text-teal-600 group-hover:scale-110 transition"
+              />
               <span className="font-medium text-gray-800 text-base">Reels</span>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <MessageCircle size={22} className="text-emerald-600 group-hover:scale-110 transition" />
-              <span className="font-medium text-gray-800 text-base">Message</span>
+              <MessageCircle
+                size={22}
+                className="text-emerald-600 group-hover:scale-110 transition"
+              />
+              <span className="font-medium text-gray-800 text-base">
+                Message
+              </span>
             </div>
             <CreatePostDialog
               trigger={
@@ -90,8 +116,13 @@ export default function Home() {
                   type="button"
                   className="flex w-full items-center gap-3 rounded-xl bg-white p-3 transition hover:bg-gray-50 hover:shadow-lg group"
                 >
-                  <Plus size={22} className="text-emerald-600 transition group-hover:scale-110" />
-                  <span className="text-base font-medium text-gray-800">Create</span>
+                  <Plus
+                    size={22}
+                    className="text-emerald-600 transition group-hover:scale-110"
+                  />
+                  <span className="text-base font-medium text-gray-800">
+                    Create
+                  </span>
                 </button>
               }
             />
@@ -104,7 +135,9 @@ export default function Home() {
                     alt={userCurrent?.username || "User"}
                   />
                 </div>
-                <span className="font-medium text-gray-800 text-base">Profile</span>
+                <span className="font-medium text-gray-800 text-base">
+                  Profile
+                </span>
               </div>
             </Link>
           </nav>
@@ -115,7 +148,10 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">
                 <img
-                  src={userCurrent?.avatar || `https://picsum.photos/seed/${userCurrent?.username || "create"}/80`}
+                  src={
+                    userCurrent?.avatar ||
+                    `https://picsum.photos/seed/${userCurrent?.username || "create"}/80`
+                  }
                   alt={userCurrent?.username || "User"}
                   className="h-full w-full object-cover"
                 />
@@ -126,7 +162,9 @@ export default function Home() {
                     type="button"
                     className="flex flex-1 items-center justify-between rounded-2xl border border-gray-200 px-4 py-3 text-left text-sm text-gray-600 transition hover:border-gray-300 hover:bg-gray-50"
                   >
-                    <span className="font-medium text-gray-700">Chia sẻ điều gì đó...</span>
+                    <span className="font-medium text-gray-700">
+                      Chia sẻ điều gì đó...
+                    </span>
                     <Plus size={18} className="text-emerald-600" />
                   </button>
                 }
@@ -141,28 +179,29 @@ export default function Home() {
               </div>
             ) : (
               allPosts?.data?.map((post) => (
-                <Post key={post.id} post={post} onSavePost={handleSavePost} 
-                />
+                <Post key={post.id} post={post} onSavePost={handleSavePost} />
               ))
             )}
-            {
-              isAllError && (
-                <div className="p-5 text-center">
-                  <p className="text-red-500 mb-3 text-lg font-semibold">Không thể tải bình luận 😥</p>
-                  <button
-                    onClick={() => refetchAll()}
-                    className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg shadow-sm transition text-base"
-                  >
-                    Thử lại
-                  </button>
-                </div>
-              )
-            }
+            {isAllError && (
+              <div className="p-5 text-center">
+                <p className="text-red-500 mb-3 text-lg font-semibold">
+                  Không thể tải bình luận 😥
+                </p>
+                <button
+                  onClick={() => refetchAll()}
+                  className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg shadow-sm transition text-base"
+                >
+                  Thử lại
+                </button>
+              </div>
+            )}
           </div>
           {allPosts?.data && allPosts?.data?.length > 0 && (
             <>
               {isFetchingNextPage && (
-                <div className="py-4 text-gray-500 text-sm">Đang tải thêm...</div>
+                <div className="py-4 text-gray-500 text-sm">
+                  Đang tải thêm...
+                </div>
               )}
               <div ref={triggerRef}></div>
             </>
@@ -188,7 +227,10 @@ export default function Home() {
                 {isLoadingRecommend ? (
                   <div className="space-y-2">
                     {[...Array(3)].map((_, idx) => (
-                      <div key={idx} className="flex items-center justify-between animate-pulse">
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between animate-pulse"
+                      >
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gray-200" />
                           <div className="space-y-1">

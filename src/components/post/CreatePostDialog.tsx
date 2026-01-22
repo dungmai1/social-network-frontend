@@ -79,7 +79,7 @@ export default function CreatePostDialog({ trigger }: CreatePostDialogProps) {
 
   const disableSubmit = useMemo(
     () => !selectedFiles.length || isPending,
-    [selectedFiles.length, isPending]
+    [selectedFiles.length, isPending],
   );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
