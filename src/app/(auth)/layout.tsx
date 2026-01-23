@@ -1,9 +1,13 @@
-import React from 'react';
+import React from "react";
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-      <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center p-4 py-8">
         {children}
       </div>
     </div>
