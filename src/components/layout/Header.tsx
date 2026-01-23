@@ -35,39 +35,67 @@ export default function Header() {
     });
   }, []);
   return (
-    <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-20">
-      <div className="mx-auto px-6 py-3 flex items-center justify-between max-w-6xl">
-        <div className="flex items-center gap-4">
+    <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-30">
+      <div className="mx-auto px-4 lg:px-6 py-3 flex items-center justify-between max-w-7xl">
+        {/* Logo */}
+        <div className="flex items-center">
           <Link href="/">
-            <div className="text-2xl font-bold text-gray-900 select-none">
-              Instagram
-            </div>
+            <img
+              src="/insta-logo.svg"
+              alt="Instagram"
+              className="h-8 hidden sm:block"
+            />
+            <svg
+              className="w-7 h-7 sm:hidden"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <rect x="2" y="2" width="20" height="20" rx="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="18" cy="6" r="1.5" fill="currentColor" />
+            </svg>
           </Link>
         </div>
-        <div className="flex items-center gap-5">
-          <div className="hidden sm:flex items-center border border-gray-300 rounded-lg px-3 py-2 gap-2 text-sm bg-gray-50">
-            <Search size={18} className="text-gray-500" />
-            <input
-              className="bg-transparent outline-none w-36 sm:w-64 text-gray-700 placeholder-gray-500 text-sm"
-              placeholder="Search"
-            />
-          </div>
-          <NotificationBell />
-          <Link href="/message" aria-label="Open CometChat">
-            <div className="p-2 rounded-lg hover:bg-gray-100 transition relative">
-              <MessageCircle size={20} className="text-gray-700" />
+
+        {/* Search */}
+        <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-4 py-2 w-64">
+          <Search size={16} className="text-gray-400 mr-2" />
+          <input
+            className="bg-transparent outline-none w-full text-sm text-gray-800 placeholder-gray-400"
+            placeholder="Search"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-1">
+          <Link href="/" className="hidden md:block">
+            <button className="p-2 rounded-lg hover:bg-gray-100 transition">
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9.005 16.545a2.997 2.997 0 012.997-2.997h0A2.997 2.997 0 0115 16.545V22h7V11.543L12 2 2 11.543V22h7.005z" />
+              </svg>
+            </button>
+          </Link>
+
+          <Link href="/message" className="hidden md:block">
+            <button className="p-2 rounded-lg hover:bg-gray-100 transition relative">
+              <MessageCircle size={24} className="text-gray-800" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
-            </div>
+            </button>
           </Link>
+
+          <NotificationBell />
+
           <button
             onClick={() => handleLogOut()}
-            className="px-4 py-2 rounded-lg hover:bg-gray-100 transition text-red-600 font-semibold border border-red-200"
+            className="ml-2 px-4 py-1.5 text-sm font-semibold text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
           >
-            Logout
+            Log out
           </button>
         </div>
       </div>

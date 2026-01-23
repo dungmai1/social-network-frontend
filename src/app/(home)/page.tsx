@@ -12,7 +12,6 @@ import {
   Film,
   Plus,
 } from "lucide-react";
-import Avatar from "@/components/common/Avatar";
 import Post from "@/components/post/Post";
 import { usePost } from "@/hooks/usePost";
 import useUser from "@/hooks/useUser";
@@ -72,47 +71,25 @@ export default function Home() {
     threshold: 0,
   });
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-white">
       <Header />
-      <main className="mx-auto px-2 md:px-8 mt-6 grid grid-cols-1 md:grid-cols-[220px_1fr_320px] gap-8 max-w-7xl">
+      <main className="mx-auto px-4 lg:px-8 pt-6 pb-20 grid grid-cols-1 lg:grid-cols-[240px_1fr_320px] gap-6 max-w-7xl">
         {/* SIDEBAR LEFT */}
-        <aside className="hidden md:block w-[200px] pt-2">
-          <nav className="sticky top-28 space-y-2">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <HomeIcon
-                size={22}
-                className="text-indigo-600 group-hover:scale-110 transition"
+        <aside className="hidden lg:block">
+          <nav className="sticky top-20 space-y-1 py-4">
+            <SidebarItem icon={<HomeIcon size={24} />} label="Home" active />
+            <SidebarItem icon={<Search size={24} />} label="Search" />
+            <SidebarItem icon={<Compass size={24} />} label="Explore" />
+            <SidebarItem icon={<Clapperboard size={24} />} label="Reels" />
+            <Link href="/message">
+              <SidebarItem
+                icon={<MessageCircle size={24} />}
+                label="Messages"
               />
-              <span className="font-medium text-gray-800 text-base">Home</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <Compass
-                size={22}
-                className="text-pink-500 group-hover:scale-110 transition"
-              />
-              <span className="font-medium text-gray-800 text-base">
-                Explore
-              </span>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <Clapperboard
-                size={22}
-                className="text-teal-600 group-hover:scale-110 transition"
-              />
-              <span className="font-medium text-gray-800 text-base">Reels</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-              <MessageCircle
-                size={22}
-                className="text-emerald-600 group-hover:scale-110 transition"
-              />
-              <span className="font-medium text-gray-800 text-base">
-                Message
-              </span>
-            </div>
+            </Link>
+            <SidebarItem icon={<Heart size={24} />} label="Notifications" />
             <a
               href="#create-post"
-              className="flex w-full items-center gap-3 rounded-xl bg-white p-3 transition hover:bg-gray-50 hover:shadow-lg group"
               onClick={(e) => {
                 e.preventDefault();
                 document
@@ -121,43 +98,56 @@ export default function Home() {
                 document.getElementById("create-post-input")?.focus();
               }}
             >
-              <Plus
-                size={22}
-                className="text-emerald-600 transition group-hover:scale-110"
-              />
-              <span className="text-base font-medium text-gray-800">
-                Create
-              </span>
+              <SidebarItem icon={<Plus size={24} />} label="Create" />
             </a>
             <Link href={`/profile/${userCurrent?.username}`}>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-white hover:shadow-lg hover:bg-gray-50 transition cursor-pointer group">
-                <div className="w-7 h-7 rounded-full overflow-hidden border border-gray-200">
+              <div className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-gray-100 transition cursor-pointer group">
+                <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-gray-300 transition">
                   <img
                     className="w-full h-full object-cover"
                     src={userCurrent?.avatar}
                     alt={userCurrent?.username || "User"}
                   />
                 </div>
-                <span className="font-medium text-gray-800 text-base">
-                  Profile
-                </span>
+                <span className="font-normal text-gray-900">Profile</span>
               </div>
             </Link>
           </nav>
         </aside>
+
         {/* FEED CENTER */}
-        <section className="md:col-span-1 lg:col-start-2 lg:col-end-3 w-full flex flex-col items-center">
-          <div id="create-post" className="w-full max-w-2xl mb-7">
+        <section className="w-full max-w-[470px] mx-auto">
+          {/* Create Post */}
+          <div id="create-post" className="mb-4">
             <CreatePostInline
               userAvatar={userCurrent?.avatar}
               username={userCurrent?.username}
             />
           </div>
-          <div className="w-full max-w-2xl space-y-3">
+
+          {/* Posts Feed */}
+          <div className="space-y-4">
             {isAllLoading ? (
-              <div className="animate-pulse space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-1/3" />
-                <div className="h-4 bg-gray-200 rounded w-2/3" />
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-gray-200" />
+                      <div className="space-y-2">
+                        <div className="h-3 w-24 bg-gray-200 rounded" />
+                        <div className="h-2 w-16 bg-gray-100 rounded" />
+                      </div>
+                    </div>
+                    <div className="aspect-square bg-gray-100 rounded-lg mb-4" />
+                    <div className="space-y-2">
+                      <div className="h-3 w-full bg-gray-200 rounded" />
+                      <div className="h-3 w-2/3 bg-gray-200 rounded" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               allPosts?.data?.map((post) => (
@@ -165,62 +155,90 @@ export default function Home() {
               ))
             )}
             {isAllError && (
-              <div className="p-5 text-center">
-                <p className="text-red-500 mb-3 text-lg font-semibold">
-                  Không thể tải bình luận 😥
-                </p>
+              <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+                <p className="text-gray-500 mb-4">Could not load posts</p>
                 <button
                   onClick={() => refetchAll()}
-                  className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg shadow-sm transition text-base"
+                  className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition"
                 >
-                  Thử lại
+                  Try again
                 </button>
               </div>
             )}
           </div>
+
+          {/* Load more trigger */}
           {allPosts?.data && allPosts?.data?.length > 0 && (
             <>
               {isFetchingNextPage && (
-                <div className="py-4 text-gray-500 text-sm">
-                  Đang tải thêm...
+                <div className="flex justify-center py-6">
+                  <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
                 </div>
               )}
               <div ref={triggerRef}></div>
             </>
           )}
         </section>
+
         {/* SIDEBAR RIGHT */}
-        <aside className="hidden lg:block pt-2 w-full max-w-xs">
-          <div className="sticky top-20 space-y-6">
-            <Avatar />
-            <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-100">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-base text-gray-600 font-semibold">
-                  Suggested for you
+        <aside className="hidden xl:block">
+          <div className="sticky top-20 space-y-5 py-4">
+            {/* Current User */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-full overflow-hidden">
+                  <img
+                    src={userCurrent?.avatar}
+                    alt={userCurrent?.username || "User"}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
+                <div>
+                  <Link href={`/profile/${userCurrent?.username}`}>
+                    <p className="text-sm font-semibold text-gray-900 hover:underline">
+                      {userCurrent?.username}
+                    </p>
+                  </Link>
+                  <p className="text-sm text-gray-400">
+                    {userCurrent?.displayname || userCurrent?.username}
+                  </p>
+                </div>
+              </div>
+              <button className="text-xs font-semibold text-blue-500 hover:text-blue-700">
+                Switch
+              </button>
+            </div>
+
+            {/* Suggestions */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-semibold text-gray-500">
+                  Suggested for you
+                </span>
                 <button
-                  className="text-xs text-indigo-500 hover:text-indigo-700 font-bold"
+                  className="text-xs font-semibold text-gray-900 hover:text-gray-600"
                   onClick={handleRecommendUser}
                 >
-                  Refresh
+                  See All
                 </button>
               </div>
+
               <div className="space-y-3">
                 {isLoadingRecommend ? (
-                  <div className="space-y-2">
-                    {[...Array(3)].map((_, idx) => (
+                  <div className="space-y-3">
+                    {[...Array(5)].map((_, idx) => (
                       <div
                         key={idx}
                         className="flex items-center justify-between animate-pulse"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gray-200" />
-                          <div className="space-y-1">
+                          <div className="w-11 h-11 rounded-full bg-gray-200" />
+                          <div className="space-y-1.5">
                             <div className="h-3 w-24 bg-gray-200 rounded" />
-                            <div className="h-2 w-16 bg-gray-100 rounded" />
+                            <div className="h-2.5 w-20 bg-gray-100 rounded" />
                           </div>
                         </div>
-                        <div className="h-6 w-16 bg-gray-100 rounded" />
+                        <div className="h-4 w-12 bg-gray-100 rounded" />
                       </div>
                     ))}
                   </div>
@@ -229,29 +247,33 @@ export default function Home() {
                     {listRecommend.map((suggestion) => (
                       <li
                         key={suggestion.id ?? suggestion.username}
-                        className="flex items-center justify-between hover:bg-gray-50 rounded-xl transition p-2"
+                        className="flex items-center justify-between"
                       >
                         <div className="flex items-center gap-3">
-                          <img
-                            src={
-                              suggestion.avatar ||
-                              `https://picsum.photos/seed/${suggestion.username}/40`
-                            }
-                            className="w-10 h-10 rounded-full border border-gray-200 object-cover"
-                            alt={suggestion.username}
-                          />
+                          <Link href={`/profile/${suggestion.username}`}>
+                            <img
+                              src={
+                                suggestion.avatar ||
+                                `https://picsum.photos/seed/${suggestion.username}/44`
+                              }
+                              className="w-11 h-11 rounded-full object-cover"
+                              alt={suggestion.username}
+                            />
+                          </Link>
                           <div>
-                            <div className="text-sm font-semibold text-gray-800">
-                              {suggestion.username}
-                            </div>
-                            <div className="text-xs text-gray-400">
+                            <Link href={`/profile/${suggestion.username}`}>
+                              <p className="text-sm font-semibold text-gray-900 hover:underline">
+                                {suggestion.username}
+                              </p>
+                            </Link>
+                            <p className="text-xs text-gray-400">
                               {suggestion.displayname || "Suggested for you"}
-                            </div>
+                            </p>
                           </div>
                         </div>
                         <button
                           onClick={() => handleAddFollow(suggestion.username)}
-                          className="text-xs px-4 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800 font-semibold rounded-lg shadow-xs transition border border-blue-100"
+                          className="text-xs font-semibold text-blue-500 hover:text-blue-700"
                         >
                           Follow
                         </button>
@@ -259,24 +281,106 @@ export default function Home() {
                     ))}
                   </ul>
                 ) : (
-                  <div className="text-sm text-gray-400 text-center py-3">
-                    No suggestions available right now.
+                  <div className="text-sm text-gray-400 text-center py-4">
+                    No suggestions available
                     <button
-                      className="block w-full text-xs text-indigo-500 font-semibold mt-2 hover:text-indigo-700"
+                      className="block w-full text-xs text-blue-500 font-semibold mt-2 hover:text-blue-700"
                       onClick={handleRecommendUser}
                     >
-                      Refresh suggestions
+                      Refresh
                     </button>
                   </div>
                 )}
               </div>
             </div>
-            <div className="text-xs text-gray-400 text-center pt-5">
-              © InstaClone • About • Help
+
+            {/* Footer Links */}
+            <div className="pt-6 space-y-4">
+              <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-gray-400">
+                <a href="#" className="hover:underline">
+                  About
+                </a>
+                <span>·</span>
+                <a href="#" className="hover:underline">
+                  Help
+                </a>
+                <span>·</span>
+                <a href="#" className="hover:underline">
+                  Press
+                </a>
+                <span>·</span>
+                <a href="#" className="hover:underline">
+                  API
+                </a>
+                <span>·</span>
+                <a href="#" className="hover:underline">
+                  Jobs
+                </a>
+                <span>·</span>
+                <a href="#" className="hover:underline">
+                  Privacy
+                </a>
+                <span>·</span>
+                <a href="#" className="hover:underline">
+                  Terms
+                </a>
+              </div>
+              <p className="text-xs text-gray-400">© 2026 Instagram Clone</p>
             </div>
           </div>
         </aside>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2 z-50">
+        <div className="flex items-center justify-around">
+          <Link href="/">
+            <div className="p-2">
+              <HomeIcon size={24} className="text-gray-900" />
+            </div>
+          </Link>
+          <div className="p-2">
+            <Search size={24} className="text-gray-600" />
+          </div>
+          <div className="p-2">
+            <Plus size={24} className="text-gray-600" />
+          </div>
+          <div className="p-2">
+            <Film size={24} className="text-gray-600" />
+          </div>
+          <Link href={`/profile/${userCurrent?.username}`}>
+            <div className="w-7 h-7 rounded-full overflow-hidden ring-1 ring-gray-900">
+              <img
+                className="w-full h-full object-cover"
+                src={userCurrent?.avatar}
+                alt={userCurrent?.username || "User"}
+              />
+            </div>
+          </Link>
+        </div>
+      </nav>
+    </div>
+  );
+}
+
+// Sidebar Item Component
+function SidebarItem({
+  icon,
+  label,
+  active = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center gap-4 px-3 py-3 rounded-lg transition cursor-pointer hover:bg-gray-100 ${
+        active ? "font-bold" : "font-normal"
+      }`}
+    >
+      <span className={active ? "text-gray-900" : "text-gray-700"}>{icon}</span>
+      <span className="text-gray-900">{label}</span>
     </div>
   );
 }
