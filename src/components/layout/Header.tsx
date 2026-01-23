@@ -1,11 +1,12 @@
 "use client";
 
-import { Heart, MessageCircle, Search } from "lucide-react";
+import { MessageCircle, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CometChatUIKit } from "@cometchat/chat-uikit-react";
 import { CometChat } from "@cometchat/chat-sdk-javascript";
+import { NotificationBell } from "@/components/notification";
 
 export default function Header() {
   const router = useRouter();
@@ -51,9 +52,7 @@ export default function Header() {
               placeholder="Search"
             />
           </div>
-          <button className="p-2 rounded-lg hover:bg-gray-100 transition">
-            <Heart size={20} className="text-gray-700" />
-          </button>
+          <NotificationBell />
           <Link href="/message" aria-label="Open CometChat">
             <div className="p-2 rounded-lg hover:bg-gray-100 transition relative">
               <MessageCircle size={20} className="text-gray-700" />

@@ -33,6 +33,8 @@ const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
   >(undefined);
   useEffect(() => {
     const initializeCometChat = async () => {
+      if (!userCurrent?.username) return;
+
       try {
         const UIKitSettings = new UIKitSettingsBuilder()
           .setAppId(COMETCHAT_CONSTANTS.APP_ID)
@@ -41,7 +43,7 @@ const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
           .subscribePresenceForAllUsers()
           .build();
         await CometChatUIKit.init(UIKitSettings);
-        const user = await CometChatUIKit.login(userCurrent!.username);
+        const user = await CometChatUIKit.login(userCurrent.username);
         console.log("Login Successful", { user });
         setUser(user);
         console.log("CometChat initialized successfully");
@@ -49,7 +51,7 @@ const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
         console.error("CometChat initialization failed:", error);
       }
     };
-    if (!user) {
+    if (!user && userCurrent?.username) {
       initializeCometChat();
     }
     if (initialUsername) {

@@ -23,7 +23,7 @@ export async function recommendUser(username: string) {
 export async function getFollower(username: string) {
     const res = await apiFetch(`${URL_BASE}/followers/${username}`, { method: "GET" });
     if (!res.ok) {
-        console.error("Error fetch Post");
+        console.error("Error fetch Follower");
         return;
     }
     const data = await res.json();
@@ -32,7 +32,7 @@ export async function getFollower(username: string) {
 export async function getFollowing(username: string) {
     const res = await apiFetch(`${URL_BASE}/following/${username}`, { method: "GET" });
     if (!res.ok) {
-        console.error("Error fetch Post");
+        console.error("Error fetch Following");
         return;
     }
     const data = await res.json();
