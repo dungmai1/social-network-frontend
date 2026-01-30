@@ -38,6 +38,7 @@ export default function Home() {
     isLoadingRecommend,
     handleRecommendUser,
     handleAddFollow,
+    followedUsers,
   } = useRelationship(userCurrent?.username ?? "");
 
   const allPosts = useMemo(
@@ -240,41 +241,53 @@ export default function Home() {
                   </div>
                 ) : listRecommend.length > 0 ? (
                   <ul className="space-y-3">
-                    {listRecommend.map((suggestion) => (
-                      <li
-                        key={suggestion.id ?? suggestion.username}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Link href={`/profile/${suggestion.username}`}>
-                            <img
-                              src={
-                                suggestion.avatar ||
-                                `https://picsum.photos/seed/${suggestion.username}/44`
-                              }
-                              className="w-11 h-11 rounded-full object-cover"
-                              alt={suggestion.username}
-                            />
-                          </Link>
-                          <div>
-                            <Link href={`/profile/${suggestion.username}`}>
-                              <p className="text-sm font-semibold text-gray-900 hover:underline">
-                                {suggestion.username}
-                              </p>
-                            </Link>
-                            <p className="text-xs text-gray-400">
-                              {suggestion.displayname || "Suggested for you"}
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleAddFollow(suggestion.username)}
-                          className="text-xs font-semibold text-blue-500 hover:text-blue-700"
+                    {listRecommend.map((suggestion) => {
+                      const isFollowed = followedUsers.includes(
+                        suggestion.username,
+                      );
+                      return (
+                        <li
+                          key={suggestion.id ?? suggestion.username}
+                          className="flex items-center justify-between"
                         >
-                          Follow
-                        </button>
-                      </li>
-                    ))}
+                          <div className="flex items-center gap-3">
+                            <Link href={`/profile/${suggestion.username}`}>
+                              <img
+                                src={
+                                  suggestion.avatar ||
+                                  `https://picsum.photos/seed/${suggestion.username}/44`
+                                }
+                                className="w-11 h-11 rounded-full object-cover"
+                                alt={suggestion.username}
+                              />
+                            </Link>
+                            <div>
+                              <Link href={`/profile/${suggestion.username}`}>
+                                <p className="text-sm font-semibold text-gray-900 hover:underline">
+                                  {suggestion.username}
+                                </p>
+                              </Link>
+                              <p className="text-xs text-gray-400">
+                                {suggestion.displayname || "Suggested for you"}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() =>
+                              !isFollowed &&
+                              handleAddFollow(suggestion.username)
+                            }
+                            className={`text-xs font-semibold ${
+                              isFollowed
+                                ? "text-gray-500 cursor-default"
+                                : "text-blue-500 hover:text-blue-700"
+                            }`}
+                          >
+                            {isFollowed ? "Following" : "Follow"}
+                          </button>
+                        </li>
+                      );
+                    })}
                   </ul>
                 ) : (
                   <div className="text-sm text-gray-400 text-center py-4">

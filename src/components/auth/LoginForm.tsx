@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/services/auth.service";
 import InstagramLogo from "./InstagramLogo";
 import SocialLoginButtons from "./SocialLoginButtons";
@@ -14,6 +14,7 @@ interface LoginFormData {
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,7 +40,10 @@ export default function LoginForm() {
         setIsLoading(false);
         return;
       }
-      router.push("/");
+      
+      // Redirect to intended page or home
+      const intendedPath = searchParams.get("from") || "/";
+      router.push(intendedPath);
     } catch (e: any) {
       setError(e.message || "An error occurred, please try again");
     } finally {
