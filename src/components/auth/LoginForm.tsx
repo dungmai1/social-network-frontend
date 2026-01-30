@@ -29,19 +29,19 @@ export default function LoginForm() {
     setIsLoading(true);
     try {
       if (!data.username || !data.password) {
-        setError("Username và password không được để trống");
+        setError("Username and password cannot be empty");
         setIsLoading(false);
         return;
       }
       const res = await login(data.username, data.password);
       if (!res) {
-        setError("Đăng nhập thất bại!");
+        setError("Login failed!");
         setIsLoading(false);
         return;
       }
       router.push("/");
     } catch (e: any) {
-      setError(e.message || "Có lỗi xảy ra, vui lòng thử lại");
+      setError(e.message || "An error occurred, please try again");
     } finally {
       setIsLoading(false);
     }

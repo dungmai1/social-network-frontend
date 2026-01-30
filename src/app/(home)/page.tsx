@@ -78,16 +78,12 @@ export default function Home() {
         <aside className="hidden lg:block">
           <nav className="sticky top-20 space-y-1 py-4">
             <SidebarItem icon={<HomeIcon size={24} />} label="Home" active />
-            <SidebarItem icon={<Search size={24} />} label="Search" />
-            <SidebarItem icon={<Compass size={24} />} label="Explore" />
-            <SidebarItem icon={<Clapperboard size={24} />} label="Reels" />
             <Link href="/message">
               <SidebarItem
                 icon={<MessageCircle size={24} />}
                 label="Messages"
               />
             </Link>
-            <SidebarItem icon={<Heart size={24} />} label="Notifications" />
             <a
               href="#create-post"
               onClick={(e) => {
@@ -219,7 +215,7 @@ export default function Home() {
                   className="text-xs font-semibold text-gray-900 hover:text-gray-600"
                   onClick={handleRecommendUser}
                 >
-                  See All
+                  Refresh
                 </button>
               </div>
 

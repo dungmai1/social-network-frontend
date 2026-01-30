@@ -1,12 +1,13 @@
 "use client";
 
-import { MessageCircle, Search } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CometChatUIKit } from "@cometchat/chat-uikit-react";
 import { CometChat } from "@cometchat/chat-sdk-javascript";
 import { NotificationBell } from "@/components/notification";
+import { SearchBar } from "@/components/search";
 
 export default function Header() {
   const router = useRouter();
@@ -60,12 +61,8 @@ export default function Header() {
         </div>
 
         {/* Search */}
-        <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-4 py-2 w-64">
-          <Search size={16} className="text-gray-400 mr-2" />
-          <input
-            className="bg-transparent outline-none w-full text-sm text-gray-800 placeholder-gray-400"
-            placeholder="Search"
-          />
+        <div className="hidden md:block">
+          <SearchBar />
         </div>
 
         {/* Actions */}

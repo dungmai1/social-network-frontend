@@ -17,7 +17,6 @@ import { useLike } from "@/hooks/useLike";
 import { useComment } from "@/hooks/useComment";
 import { PostModel } from "@/types/post";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import Post from "@/components/post/Post";
 import useRelationship from "@/hooks/useRelationship";
 import Header from "@/components/layout/Header";
 import QRCodeSVG from "react-qr-code";
@@ -83,8 +82,6 @@ export default function ProfilePage({
   const safeUserPosts = userPosts ?? [];
   const safeSavedPosts = savedPosts ?? [];
 
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<PostModel | null>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -94,17 +91,6 @@ export default function ProfilePage({
   });
   const [showFollowersDialog, setShowFollowersDialog] = useState(false);
   const [showFollowingsDialog, setShowFollowingsDialog] = useState(false);
-
-  const handleSavePost = useCallback(
-    async (postId: number) => {
-      try {
-        await savePostMutation.mutateAsync(postId);
-      } catch (error) {
-        console.error("Failed to save post", error);
-      }
-    },
-    [savePostMutation],
-  );
 
   const profileUrl =
     typeof window !== "undefined"
@@ -328,15 +314,9 @@ export default function ProfilePage({
             <div className="grid grid-cols-3 gap-1 md:gap-4">
               {safeUserPosts.length > 0 ? (
                 safeUserPosts.map((post) => (
-                  <div
-                    key={post.id}
-                    onClick={() => {
-                      setSelectedPost(post);
-                      setShowDialog(true);
-                    }}
-                  >
+                  <Link key={post.id} href={`/post/${post.id}`}>
                     <ProfilePostItem post={post} />
-                  </div>
+                  </Link>
                 ))
               ) : (
                 <div className="col-span-3 flex flex-col items-center justify-center py-16 text-gray-500">
@@ -351,14 +331,6 @@ export default function ProfilePage({
                 </div>
               )}
             </div>
-            {/* Popup chi tiết post */}
-            <Dialog open={showDialog} onOpenChange={setShowDialog}>
-              <DialogContent className="overflow-auto max-h-[80vh]">
-                {selectedPost && (
-                  <Post post={selectedPost} onSavePost={handleSavePost} />
-                )}
-              </DialogContent>
-            </Dialog>
           </>
         )}
 
@@ -379,28 +351,21 @@ export default function ProfilePage({
                   <Bookmark size={24} />
                 </div>
                 <h3 className="text-xl font-light mb-2">
-                  Không thể tải danh sách đã lưu
+                  Could not load saved list
                 </h3>
                 <button
                   onClick={() => refetchSaved()}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition"
                 >
-                  Thử lại
+                  Try again
                 </button>
               </div>
             ) : safeSavedPosts.length > 0 ? (
               <div className="grid grid-cols-3 gap-1 md:gap-4">
                 {safeSavedPosts.map((post) => (
-                  <div
-                    key={`saved-${post.id}`}
-                    onClick={() => {
-                      setSelectedPost(post);
-                      setShowDialog(true);
-                    }}
-                    className="cursor-pointer"
-                  >
+                  <Link key={`saved-${post.id}`} href={`/post/${post.id}`}>
                     <ProfilePostItem post={post} />
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (
@@ -409,11 +374,10 @@ export default function ProfilePage({
                   <Bookmark size={24} />
                 </div>
                 <h3 className="text-xl font-light mb-2">
-                  Chưa có bài viết đã lưu
+                  No saved posts yet
                 </h3>
                 <p className="text-sm text-center max-w-sm">
-                  Các bài viết bạn lưu sẽ xuất hiện tại đây. Hãy khám phá và lưu
-                  lại những nội dung bạn yêu thích.
+                  Posts you save will appear here. Explore and save content you love.
                 </p>
               </div>
             )}
@@ -623,7 +587,7 @@ export default function ProfilePage({
               <input
                 type="text"
                 className="w-full border rounded-md px-3 py-2"
-                value={editValues.displayName} // cần state editValues cho các giá trị
+                value={editValues.displayName} // Need editValues state for values
                 onChange={(e) =>
                   setEditValues((v) => ({ ...v, displayName: e.target.value }))
                 }
@@ -646,14 +610,14 @@ export default function ProfilePage({
                 onClick={() => setShowEditDialog(false)}
                 className="px-4 py-2 rounded-md border"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 type="submit"
                 className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
                 onClick={handleEditProfile}
               >
-                Lưu
+                Save
               </button>
             </div>
           </form>

@@ -3,6 +3,22 @@ import { PostModel, PostResponse } from "../types/post";
 
 const URL_BASE = "/post";
 
+export async function getPostById(postId: number) {
+  try {
+    const res = await apiFetch(`${URL_BASE}/${postId}`, {
+      method: "GET",
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    const data: PostModel = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching post:", error);
+    throw error;
+  }
+}
+
 export async function getAllPost(cursor: string) {
   try {
     const res = await apiFetch(`${URL_BASE}/GetAllPost?cursor=${cursor}`, {
@@ -45,7 +61,7 @@ export async function getSavedPostsByUsername(username?: string) {
   try {
     const res = await apiFetch(
       `${URL_BASE}/GetAllSavedPostByUsername?username=${username}`,
-      { method: "GET" }
+      { method: "GET" },
     );
     if (!res.ok) {
       throw new Error(`Failed to fetch saved posts: ${res.status}`);

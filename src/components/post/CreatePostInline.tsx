@@ -80,19 +80,19 @@ export default function CreatePostInline({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!selectedFiles.length) {
-      setError("Vui lòng chọn ít nhất một ảnh.");
+      setError("Please select at least one image.");
       return;
     }
     setError(null);
     const formData = buildFormData({ content: caption.trim() }, selectedFiles);
     try {
       await submitPost(formData);
-      setSuccessMessage("Bài viết đã được tạo thành công!");
+      setSuccessMessage("Post created successfully!");
       setTimeout(() => {
         resetForm();
       }, 1500);
     } catch (err) {
-      setError("Không thể tạo bài viết. Vui lòng thử lại.");
+      setError("Could not create post. Please try again.");
     }
   };
 
@@ -127,7 +127,7 @@ export default function CreatePostInline({
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 onFocus={handleInputFocus}
-                placeholder="Bạn đang nghĩ gì?"
+                placeholder="What's on your mind?"
                 rows={isExpanded ? 3 : 1}
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-gray-400 focus:outline-none resize-none transition-all"
               />
@@ -143,16 +143,16 @@ export default function CreatePostInline({
               <div className="flex flex-col items-center gap-2 text-gray-600">
                 <ImagePlus size={32} />
                 <p className="text-sm">
-                  Kéo thả hoặc chọn nhiều ảnh để tải lên.
+                  Drag and drop or select multiple images to upload.
                 </p>
                 <p className="text-xs text-gray-400">
-                  Hỗ trợ PNG, JPG, JPEG, WEBP.
+                  Supports PNG, JPG, JPEG, WEBP.
                 </p>
               </div>
               <div>
                 <label className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-500 cursor-pointer transition">
                   <Upload size={18} />
-                  Chọn ảnh
+                  Choose images
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/jpg,image/webp"
@@ -203,7 +203,7 @@ export default function CreatePostInline({
                 disabled={isPending}
                 className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition disabled:opacity-50"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 type="submit"
@@ -211,7 +211,7 @@ export default function CreatePostInline({
                 className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-xl shadow hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isPending && <Loader2 className="animate-spin" size={18} />}
-                Đăng bài
+                Post
               </button>
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function CreatePostInline({
             <div className="flex gap-4">
               <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-emerald-600 transition">
                 <ImagePlus size={20} className="text-emerald-600" />
-                <span>Ảnh</span>
+                <span>Image</span>
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/jpg,image/webp"

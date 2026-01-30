@@ -7,7 +7,7 @@ import {
 
 const URL_BASE = "/notifications";
 
-// Lấy danh sách notifications có phân trang
+// Get paginated notifications list
 export async function getNotifications(
   page: number = 1,
   limit: number = 20,
@@ -28,7 +28,7 @@ export async function getNotifications(
   }
 }
 
-// Lấy số lượng notification chưa đọc
+// Get unread notification count
 export async function getUnreadCount(): Promise<number> {
   try {
     const res = await apiFetch(`${URL_BASE}/unread-count`, {
@@ -46,7 +46,7 @@ export async function getUnreadCount(): Promise<number> {
   }
 }
 
-// Đánh dấu đã đọc (một hoặc nhiều)
+// Mark as read (one or many)
 export async function markAsRead(
   notificationIds: number[],
 ): Promise<MarkedCountResponse | null> {
@@ -67,7 +67,7 @@ export async function markAsRead(
   }
 }
 
-// Đánh dấu tất cả đã đọc
+// Mark all as read
 export async function markAllAsRead(): Promise<MarkedCountResponse | null> {
   try {
     const res = await apiFetch(`${URL_BASE}/mark-all-read`, {
@@ -85,7 +85,7 @@ export async function markAllAsRead(): Promise<MarkedCountResponse | null> {
   }
 }
 
-// Xóa notification
+// Delete notification
 export async function deleteNotification(
   notificationId: number,
 ): Promise<boolean> {

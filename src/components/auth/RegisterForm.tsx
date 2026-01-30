@@ -30,7 +30,7 @@ export default function RegisterForm() {
   const onSubmit = async (data: RegisterFormData) => {
     setError("");
     if (data.password !== data.repassword) {
-      setError("Mật khẩu nhập lại không khớp");
+      setError("Passwords do not match");
       return;
     }
     setIsLoading(true);
@@ -42,7 +42,7 @@ export default function RegisterForm() {
         data.password,
       );
     } catch (e: any) {
-      setError(e?.message || "Có lỗi xảy ra, vui lòng thử lại");
+      setError(e?.message || "An error occurred, please try again");
     } finally {
       setIsLoading(false);
     }

@@ -108,7 +108,7 @@ export default function Post({
       await deletePost(post.id);
       setIsDeleted(true);
       setShowOptions(false);
-      // Gọi callback sau khi đã cập nhật UI
+      // Call callback after UI update
       setTimeout(() => {
         onDeletePost?.(post.id);
       }, 300);
