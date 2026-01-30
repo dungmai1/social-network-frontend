@@ -4,8 +4,6 @@ import { MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CometChatUIKit } from "@cometchat/chat-uikit-react";
-import { CometChat } from "@cometchat/chat-sdk-javascript";
 import { NotificationBell } from "@/components/notification";
 import { SearchBar } from "@/components/search";
 
@@ -15,13 +13,9 @@ export default function Header() {
 
   const handleLogOut = async () => {
     try {
-      await CometChatUIKit.logout()
-        .then(() => {
-          console.log("Logout success");
-        })
-        .catch((error) => {
-          console.log("Logout error:", error);
-        });
+      // Dynamic import CometChat SDK only when needed
+      const { CometChatUIKit } = await import("@cometchat/chat-uikit-react");
+      await CometChatUIKit.logout();
       console.log("CometChat logout successful");
       router.push("/login");
     } catch (error) {
@@ -29,10 +23,18 @@ export default function Header() {
       router.push("/login");
     }
   };
+
   useEffect(() => {
-    CometChat.getUnreadMessageCount().then((res) => {
-      const users = (res as any).users || {};
-      setUnreadCount(Object.keys(users).length);
+    // Dynamic import CometChat SDK only when component mounts
+    import("@cometchat/chat-sdk-javascript").then(({ CometChat }) => {
+      CometChat.getUnreadMessageCount()
+        .then((res) => {
+          const users = (res as any).users || {};
+          setUnreadCount(Object.keys(users).length);
+        })
+        .catch((error) => {
+          console.log("Failed to get unread count:", error);
+        });
     });
   }, []);
   return (
