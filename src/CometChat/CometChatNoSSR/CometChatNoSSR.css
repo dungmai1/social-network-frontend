@@ -1,46 +1,176 @@
 /* Layout for the main container that holds conversations and messages */
 .conversations-with-messages {
-    display: flex;
-    height: 100%;
-    width: 100%;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background: var(--cometchat-background-color-02);
 }
 
 /* Sidebar wrapper for conversation list */
 .conversations-wrapper {
-    height: 100%;
-    width: 480px; /* Fixed width for conversation list */
-    overflow: hidden; /* Hide any overflowing content */
-    display: flex;
-    flex-direction: column;
-    height: inherit;
+  height: 100%;
+  width: 380px;
+  min-width: 320px;
+  max-width: 420px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--cometchat-background-color-01);
+  border-right: 1px solid var(--cometchat-border-color-light);
+  border-radius: 0;
+}
+
+/* Glass effect for light mode */
+@media (prefers-color-scheme: light) {
+  .conversations-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* Glass effect for dark mode */
+.dark .conversations-wrapper {
+  background: rgba(26, 16, 37, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-color: rgba(59, 37, 99, 0.5);
 }
 
 /* Hide overflow content inside the conversation component */
 .conversations-wrapper > .cometchat {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 /* Message section layout */
 .messages-wrapper {
-    width: calc(100% - 480px); /* Take remaining space */
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+  width: calc(100% - 380px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--cometchat-background-color-02);
+  position: relative;
+}
+
+/* Glass effect for messages */
+@media (prefers-color-scheme: light) {
+  .messages-wrapper {
+    background: rgba(250, 245, 255, 0.8);
+  }
+}
+
+.dark .messages-wrapper {
+  background: rgba(15, 10, 26, 0.8);
 }
 
 /* Styling for when no conversation is selected */
 .empty-conversation {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: white;
-    color: var(--cometchat-text-color-secondary, #727272);
-    font: var(--cometchat-font-body-regular, 400 14px Roboto);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  background: var(--cometchat-background-color-02);
+  color: var(--cometchat-text-color-secondary);
+  font-family: var(--font-work-sans), system-ui, sans-serif;
+}
+
+.empty-conversation-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 50%, #EC4899 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.25);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.empty-conversation-icon svg {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+
+.empty-conversation-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--cometchat-text-color-primary);
+  margin: 0;
+}
+
+.empty-conversation-subtitle {
+  font-size: 0.875rem;
+  color: var(--cometchat-text-color-secondary);
+  margin: 0;
 }
 
 /* Ensure message composer does not have rounded corners */
 .cometchat .cometchat-message-composer {
-    border-radius: 0px;
+  border-radius: 0px;
+  border-top: 1px solid var(--cometchat-border-color-light);
+}
+
+/* Message header styling */
+.messages-wrapper .cometchat-message-header {
+  background: var(--cometchat-background-color-01);
+  border-bottom: 1px solid var(--cometchat-border-color-light);
+}
+
+/* Message list background */
+.messages-wrapper .cometchat-message-list {
+  flex: 1;
+  background: var(--cometchat-background-color-02);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .conversations-with-messages {
+    flex-direction: column;
+  }
+
+  .conversations-wrapper {
+    width: 100%;
+    max-width: 100%;
+    height: 40%;
+    border-right: none;
+    border-bottom: 1px solid var(--cometchat-border-color-light);
+  }
+
+  .messages-wrapper {
+    width: 100%;
+    height: 60%;
+  }
+}
+
+@media (max-width: 480px) {
+  .conversations-wrapper {
+    height: 100%;
+    display: none;
+  }
+
+  .conversations-wrapper.active {
+    display: flex;
+  }
+
+  .messages-wrapper {
+    width: 100%;
+    height: 100%;
+  }
+
+  .messages-wrapper.hidden {
+    display: none;
+  }
 }

@@ -10,9 +10,11 @@ import {
 } from "@cometchat/chat-uikit-react";
 import { CometChat } from "@cometchat/chat-sdk-javascript";
 import "./CometChatNoSSR.css";
+import "../CometChatTheme.css";
 import { CometChatSelector } from "@/CometChat/CometChatSelector/CometChatSelector";
 import { useUserStore } from "@/hooks/useUserStore";
 import useUser from "@/hooks/useUser";
+import { MessageSquare, Users, Sparkles } from "lucide-react";
 
 // Constants for CometChat configuration
 const COMETCHAT_CONSTANTS = {
@@ -20,9 +22,11 @@ const COMETCHAT_CONSTANTS = {
   REGION: process.env.NEXT_PUBLIC_COMETCHAT_REGION ?? "",
   AUTH_KEY: process.env.NEXT_PUBLIC_COMETCHAT_AUTH_KEY ?? "",
 };
+
 interface CometChatNoSSRProps {
   initialUsername?: string;
 }
+
 const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
   const user = useUserStore((state) => state.user);
   const { userCurrent } = useUser();
@@ -33,6 +37,19 @@ const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
   const [selectedGroup, setSelectedGroup] = useState<
     CometChat.Group | undefined
   >(undefined);
+  const [isMobileView, setIsMobileView] = useState(false);
+  const [showConversations, setShowConversations] = useState(true);
+
+  useEffect(() => {
+    const checkMobileView = () => {
+      setIsMobileView(window.innerWidth <= 480);
+    };
+    
+    checkMobileView();
+    window.addEventListener('resize', checkMobileView);
+    return () => window.removeEventListener('resize', checkMobileView);
+  }, []);
+
   useEffect(() => {
     const initializeCometChat = async () => {
       if (!userCurrent?.username) return;
@@ -60,13 +77,23 @@ const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
       CometChat.getUser(initialUsername).then((user) => {
         setSelectedUser(user);
         setSelectedGroup(undefined);
+        if (isMobileView) {
+          setShowConversations(false);
+        }
       });
     }
-  }, [user, userCurrent]);
+  }, [user, userCurrent, initialUsername, isMobileView]);
+
+  const handleBackToConversations = () => {
+    setShowConversations(true);
+    setSelectedUser(undefined);
+    setSelectedGroup(undefined);
+  };
+
   return user ? (
     <div className="conversations-with-messages">
       {/* Sidebar with conversation list */}
-      <div className="conversations-wrapper">
+      <div className={`conversations-wrapper ${isMobileView && !showConversations ? '' : 'active'}`}>
         <CometChatSelector
           onSelectorItemClicked={(activeItem) => {
             let item = activeItem;
@@ -77,12 +104,17 @@ const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
             // Update states based on the type of selected item
             if (item instanceof CometChat.User) {
               setSelectedUser(item as CometChat.User);
-              console.log("item", item);
               setSelectedGroup(undefined);
               window.history.pushState(null, "", `/message/${item.getUid()}`);
+              if (isMobileView) {
+                setShowConversations(false);
+              }
             } else if (item instanceof CometChat.Group) {
               setSelectedUser(undefined);
               setSelectedGroup(item as CometChat.Group);
+              if (isMobileView) {
+                setShowConversations(false);
+              }
             } else {
               setSelectedUser(undefined);
               setSelectedGroup(undefined);
@@ -93,16 +125,28 @@ const CometChatNoSSR: React.FC<CometChatNoSSRProps> = ({ initialUsername }) => {
 
       {/* Message view section */}
       {selectedUser || selectedGroup ? (
-        <div className="messages-wrapper">
-          <CometChatMessageHeader user={selectedUser} group={selectedGroup} />
+        <div className={`messages-wrapper ${isMobileView && showConversations ? 'hidden' : ''}`}>
+          <CometChatMessageHeader 
+            user={selectedUser} 
+            group={selectedGroup}
+            onBack={isMobileView ? handleBackToConversations : undefined}
+          />
           <CometChatMessageList user={selectedUser} group={selectedGroup} />
           <CometChatMessageComposer user={selectedUser} group={selectedGroup} />
         </div>
       ) : (
-        <div className="empty-conversation">Select Conversation to start</div>
+        <div className="empty-conversation">
+          <div className="empty-conversation-icon">
+            <MessageSquare />
+          </div>
+          <h3 className="empty-conversation-title">Start a Conversation</h3>
+          <p className="empty-conversation-subtitle">
+            Select a chat or find someone to message
+          </p>
+        </div>
       )}
     </div>
-  ) : undefined;
+  ) : null;
 };
 
 export default CometChatNoSSR;

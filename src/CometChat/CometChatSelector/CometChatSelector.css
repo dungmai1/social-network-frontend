@@ -1,33 +1,76 @@
 /* Style the icon inside header menu in conversation list */
 .selector-wrapper .cometchat-conversations .cometchat-list__header-menu .cometchat-button__icon {
-  background: var(--cometchat-icon-color-primary); /* Primary icon color */
+  background: var(--cometchat-icon-color-primary, #4C1D95);
 }
 
 /* Highlight icon on hover */
 .cometchat-conversations .cometchat-list__header-menu .cometchat-button__icon:hover {
-  background: var(--cometchat-icon-color-highlight); /* Highlighted icon color on hover */
+  background: var(--cometchat-primary-color, #7C3AED);
 }
 
 /* Remove right border from the search bar inside the list */
 .cometchat-list__header-search-bar {
   border-right: none;
+  padding: 8px 12px;
+}
+
+/* Search bar input styling */
+.cometchat-list__header-search-bar input {
+  background: var(--cometchat-background-color-03, #EDE9FE) !important;
+  border: 1px solid var(--cometchat-border-color-default, #DDD6FE) !important;
+  border-radius: 12px !important;
+  padding: 10px 16px !important;
+  font-family: var(--font-work-sans), system-ui, sans-serif;
+  transition: all 0.2s ease !important;
+}
+
+.cometchat-list__header-search-bar input:focus {
+  border-color: var(--cometchat-primary-color, #7C3AED) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
+  outline: none !important;
+}
+
+.cometchat-list__header-search-bar input::placeholder {
+  color: var(--cometchat-text-color-tertiary, #A78BFA);
 }
 
 /* Align menu list items to the left */
 .cometchat .cometchat-menu-list__sub-menu-list-item {
   text-align: left;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin: 2px 8px;
+  transition: all 0.2s ease;
+}
+
+.cometchat .cometchat-menu-list__sub-menu-list-item:hover {
+  background: var(--cometchat-background-color-03, #EDE9FE);
 }
 
 /* Positioning for the submenu inside conversations menu */
 .cometchat .cometchat-conversations .cometchat-menu-list__sub-menu-list {
-  width: 212px;
-  top: 40px !important;
-  left: 172px !important;
+  width: 220px;
+  top: 44px !important;
+  left: auto !important;
+  right: 8px !important;
+  background: var(--cometchat-background-color-01, #FFFFFF);
+  border: 1px solid var(--cometchat-border-color-default, #DDD6FE);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+  padding: 8px 0;
+}
+
+.dark .cometchat .cometchat-conversations .cometchat-menu-list__sub-menu-list {
+  background: var(--cometchat-background-color-01, #1A1025);
+  border-color: var(--cometchat-border-color-default, #3B2563);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Style for the logged-in user section with bottom border */
 #logged-in-user {
-  border-bottom: 2px solid var(--cometchat-border-color-default, #E8E8E8);
+  border-bottom: 1px solid var(--cometchat-border-color-default, #DDD6FE);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 /* Make submenu items under logged-in user non-clickable */
@@ -38,12 +81,12 @@
 
 /* Logout icon color inside submenu */
 .cometchat-menu-list__sub-menu-list-item-icon-log-out {
-  background-color: var(--cometchat-error-color, #F44649); /* Error color */
+  background-color: var(--cometchat-error-color, #EF4444);
 }
 
 /* Logout label/text color inside submenu */
 .cometchat-menu-list__sub-menu-item-title-log-out {
-  color: var(--cometchat-error-color, #F44649);
+  color: var(--cometchat-error-color, #EF4444);
 }
 
 /* Enable pointer cursor for chat menu item titles */
@@ -58,7 +101,45 @@
 
 /* Style the icons inside chat menu items */
 .chat-menu .cometchat .cometchat-menu-list__sub-menu-icon {
-  background-color: var(--cometchat-icon-color-primary, #141414);
-  width: 24px;
-  height: 24px;
+  background-color: var(--cometchat-icon-color-primary, #4C1D95);
+  width: 20px;
+  height: 20px;
+}
+
+/* List header title */
+.cometchat-list__header-title {
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--cometchat-text-color-primary, #4C1D95);
+}
+
+/* Conversation list item styling */
+.cometchat-conversations .cometchat-list-item {
+  padding: 12px;
+  margin: 4px 8px;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+
+.cometchat-conversations .cometchat-list-item:hover {
+  background: var(--cometchat-background-color-03, #EDE9FE);
+}
+
+.cometchat-conversations .cometchat-list-item--active {
+  background: var(--cometchat-extended-primary-color-100, #EDE9FE);
+  border-left: 3px solid var(--cometchat-primary-color, #7C3AED);
+}
+
+.dark .cometchat-conversations .cometchat-list-item--active {
+  background: var(--cometchat-extended-primary-color-200, #2D1F42);
+}
+
+/* Avatar styling in lists */
+.cometchat-list-item .cometchat-avatar {
+  border: 2px solid var(--cometchat-extended-primary-color-200, #DDD6FE);
+}
+
+.cometchat-list-item--active .cometchat-avatar {
+  border-color: var(--cometchat-primary-color, #7C3AED);
 }

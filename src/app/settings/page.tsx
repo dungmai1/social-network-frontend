@@ -410,26 +410,6 @@ export default function SettingsPage() {
                   label: "Private Account",
                   desc: "Only approved followers can see your posts",
                 },
-                {
-                  key: "showActivityStatus",
-                  label: "Show Activity Status",
-                  desc: "Let others see when you're online",
-                },
-                {
-                  key: "showReadReceipts",
-                  label: "Show Read Receipts",
-                  desc: "Let others know when you've read their messages",
-                },
-                {
-                  key: "allowTagging",
-                  label: "Allow Tagging",
-                  desc: "Let others tag you in their posts",
-                },
-                {
-                  key: "allowMentions",
-                  label: "Allow Mentions",
-                  desc: "Let others mention you in comments",
-                },
               ].map((item) => (
                 <div key={item.key} className="glass-card rounded-xl p-5">
                   <div className="flex items-center justify-between">
@@ -507,50 +487,6 @@ export default function SettingsPage() {
                   </button>
                 </div>
               </div>
-
-              {/* Two-Factor Auth */}
-              <div className="glass-card rounded-xl p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-foreground">
-                      Two-Factor Authentication
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
-                    </p>
-                  </div>
-                  <ToggleSwitch
-                    enabled={securitySettings.twoFactorEnabled}
-                    onChange={(value) =>
-                      setSecuritySettings({
-                        ...securitySettings,
-                        twoFactorEnabled: value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-
-              {/* Login Alerts */}
-              <div className="glass-card rounded-xl p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-foreground">Login Alerts</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when someone logs into your account
-                    </p>
-                  </div>
-                  <ToggleSwitch
-                    enabled={securitySettings.loginAlerts}
-                    onChange={(value) =>
-                      setSecuritySettings({
-                        ...securitySettings,
-                        loginAlerts: value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
             </div>
           </div>
         );
@@ -574,7 +510,7 @@ export default function SettingsPage() {
                 {[
                   { id: "light", label: "Light", icon: Sun },
                   { id: "dark", label: "Dark", icon: Moon },
-                  { id: "system", label: "System", icon: Monitor },
+                  // { id: "system", label: "System", icon: Monitor },
                 ].map((option) => {
                   const Icon = option.icon;
                   const isSelected = theme === option.id;

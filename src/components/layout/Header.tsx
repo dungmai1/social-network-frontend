@@ -181,20 +181,6 @@ export default function Header() {
                       <Moon size={16} />
                       Dark
                     </button>
-                    <button
-                      onClick={() => {
-                        setTheme("system");
-                        setShowThemeMenu(false);
-                      }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent/50 transition-colors cursor-pointer ${
-                        theme === "system"
-                          ? "text-primary font-medium"
-                          : "text-foreground"
-                      }`}
-                    >
-                      <Monitor size={16} />
-                      System
-                    </button>
                   </div>
                 )}
               </div>

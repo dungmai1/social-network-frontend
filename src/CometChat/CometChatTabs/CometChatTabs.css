@@ -1,63 +1,100 @@
 /* Main container for the CometChat tab bar */
 .cometchat-tab-component {
-  display: flex; /* Align child tabs horizontally */
-  width: 100%; /* Full-width tab bar */
-  padding: 0px 8px; /* Horizontal padding */
-  align-items: flex-start; /* Align tab items to the top */
-  gap: 8px; /* Space between tab items */
-  border-top: 1px solid var(--cometchat-border-color-light, #f5f5f5); /* Top border */
-  border-right: 1px solid var(--cometchat-border-color-light, #f5f5f5); /* Right border */
-  background: var(--cometchat-background-color-01, #fff); /* Background color */
+  display: flex;
+  width: 100%;
+  padding: 8px 12px;
+  align-items: center;
+  gap: 4px;
+  border-top: 1px solid var(--cometchat-border-color-light, #E9D5FF);
+  background: var(--cometchat-background-color-01, #fff);
+}
+
+/* Glass effect for light mode */
+@media (prefers-color-scheme: light) {
+  .cometchat-tab-component {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Glass effect for dark mode */
+.dark .cometchat-tab-component {
+  background: rgba(26, 16, 37, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: rgba(59, 37, 99, 0.5);
 }
 
 /* Styles for each individual tab */
 .cometchat-tab-component__tab {
   display: flex;
-  flex-direction: column; /* Stack icon and text vertically */
-  justify-content: center; /* Center vertically */
-  align-items: center; /* Center horizontally */
-  padding: 12px 0px 10px 0px; /* Top and bottom spacing */
-  gap: 4px; /* Space between icon and text */
-  flex: 1 0 0; /* Equally distribute available space among tabs */
-  min-height: 48px; /* Minimum height for consistent layout */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 4px;
+  gap: 4px;
+  flex: 1;
+  min-height: 56px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cometchat-tab-component__tab:hover {
+  background: var(--cometchat-background-color-03, #EDE9FE);
+}
+
+.cometchat-tab-component__tab:active {
+  transform: scale(0.98);
 }
 
 /* Default tab icon style */
 .cometchat-tab-component__tab-icon {
   display: flex;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   justify-content: center;
   align-items: center;
-  background: var(
-    --cometchat-icon-color-secondary
-  ); /* Default icon background */
+  background: var(--cometchat-icon-color-secondary, #6D28D9);
   -webkit-mask-size: contain;
   -webkit-mask-position: center;
   -webkit-mask-repeat: no-repeat;
   mask-size: contain;
   mask-position: center;
   mask-repeat: no-repeat;
-  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 /* Tab text label style */
 .cometchat-tab-component__tab-text {
-  color: var(
-    --cometchat-text-color-secondary,
-    #727272
-  ); /* Default label color */
+  color: var(--cometchat-text-color-secondary, #6D28D9);
   text-align: center;
-  font: var(--cometchat-font-caption1-medium, 500 12px Roboto); /* Font style */
-  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-work-sans), system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
 }
 
 /* Highlighted icon style for active/hovered tab */
 .cometchat-tab-component__tab-icon-active {
-  background: var(--cometchat-icon-color-highlight); /* Highlight color */
+  background: var(--cometchat-primary-color, #7C3AED);
+  transform: scale(1.1);
 }
 
 /* Highlighted text style for active/hovered tab */
 .cometchat-tab-component__tab-text-active {
-  color: var(--cometchat-text-color-highlight); /* Highlighted text color */
+  color: var(--cometchat-primary-color, #7C3AED);
+  font-weight: 600;
+}
+
+/* Active tab background indicator */
+.cometchat-tab-component__tab:has(.cometchat-tab-component__tab-icon-active) {
+  background: var(--cometchat-extended-primary-color-100, #EDE9FE);
+}
+
+.dark .cometchat-tab-component__tab:has(.cometchat-tab-component__tab-icon-active) {
+  background: var(--cometchat-extended-primary-color-200, #2D1F42);
 }
