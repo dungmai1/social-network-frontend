@@ -9,6 +9,7 @@ export default function SearchBar() {
   const { searchResults, isLoading, searchQuery, handleSearch, clearSearch } =
     useSearchUser();
   const [isOpen, setIsOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -29,6 +30,7 @@ export default function SearchBar() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    setInputValue(value);
 
     // Debounce search
     if (debounceRef.current) {
@@ -51,10 +53,7 @@ export default function SearchBar() {
   const handleClear = () => {
     clearSearch();
     setIsOpen(false);
-    const input = searchRef.current?.querySelector("input");
-    if (input) {
-      input.value = "";
-    }
+    setInputValue("");
   };
 
   const handleResultClick = () => {
@@ -65,23 +64,24 @@ export default function SearchBar() {
   return (
     <div ref={searchRef} className="relative">
       {/* Search Input */}
-      <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 w-64">
-        <Search size={16} className="text-gray-400 mr-2" />
+      <div className="flex items-center bg-muted/50 border border-border rounded-xl px-4 py-2.5 w-64 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+        <Search size={18} className="text-muted-foreground mr-3" />
         <input
-          className="bg-transparent outline-none w-full text-sm text-gray-800 placeholder-gray-400"
-          placeholder="Search"
+          className="bg-transparent outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
+          placeholder="Search users..."
+          value={inputValue}
           onChange={handleInputChange}
           onFocus={() => searchQuery && setIsOpen(true)}
         />
         {isLoading ? (
-          <Loader2 size={16} className="text-gray-400 animate-spin" />
+          <Loader2 size={16} className="text-primary animate-spin" />
         ) : (
-          searchQuery && (
+          inputValue && (
             <button
               onClick={handleClear}
-              className="p-0.5 hover:bg-gray-200 rounded-full"
+              className="p-1 hover:bg-accent rounded-full transition-colors cursor-pointer"
             >
-              <X size={14} className="text-gray-400" />
+              <X size={14} className="text-muted-foreground" />
             </button>
           )
         )}
@@ -89,10 +89,15 @@ export default function SearchBar() {
 
       {/* Dropdown Results */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 glass-card rounded-xl shadow-xl max-h-80 overflow-y-auto z-50 scrollbar-thin">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 size={24} className="text-gray-400 animate-spin" />
+              <div className="flex items-center gap-2">
+                <Loader2 size={20} className="text-primary animate-spin" />
+                <span className="text-sm text-muted-foreground">
+                  Searching...
+                </span>
+              </div>
             </div>
           ) : searchResults.length > 0 ? (
             <div className="py-2">
@@ -101,19 +106,22 @@ export default function SearchBar() {
                   key={user.id}
                   href={`/profile/${user.username}`}
                   onClick={handleResultClick}
-                  className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors cursor-pointer"
                 >
                   <img
-                    src={user.avatar || "/default-avatar.png"}
+                    src={
+                      user.avatar ||
+                      `https://picsum.photos/seed/${user.username}/80`
+                    }
                     alt={user.username}
-                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                    className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20"
                   />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-sm text-gray-900">
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-semibold text-sm text-foreground truncate">
                       {user.username}
                     </span>
                     {user.displayname && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground truncate">
                         {user.displayname}
                       </span>
                     )}
@@ -122,8 +130,14 @@ export default function SearchBar() {
               ))}
             </div>
           ) : (
-            <div className="py-8 text-center text-gray-500 text-sm">
-              No results found
+            <div className="py-8 text-center">
+              <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
+                <Search size={20} className="text-muted-foreground" />
+              </div>
+              <p className="text-sm text-muted-foreground">No results found</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Try searching for a different name
+              </p>
             </div>
           )}
         </div>

@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { register as registerAccount } from "@/services/auth.service";
-import InstagramLogo from "./InstagramLogo";
-import AppDownloadButtons from "./AppDownloadButtons";
+import { User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, Loader2, Check } from "lucide-react";
+import AppLogo from "./AppLogo";
+import Link from "next/link";
 
 interface RegisterFormData {
   username: string;
@@ -16,8 +17,10 @@ interface RegisterFormData {
 export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { register, handleSubmit } = useForm<RegisterFormData>({
+  const { register, handleSubmit, watch } = useForm<RegisterFormData>({
     defaultValues: {
       username: "",
       displayname: "",
@@ -27,10 +30,20 @@ export default function RegisterForm() {
     },
   });
 
+  const password = watch("password");
+  const repassword = watch("repassword");
+
+  const passwordsMatch = password && repassword && password === repassword;
+  const passwordMinLength = password && password.length >= 8;
+
   const onSubmit = async (data: RegisterFormData) => {
     setError("");
     if (data.password !== data.repassword) {
       setError("Passwords do not match");
+      return;
+    }
+    if (data.password.length < 8) {
+      setError("Password must be at least 8 characters");
       return;
     }
     setIsLoading(true);
@@ -49,119 +62,184 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <div className="w-full max-w-md mx-auto">
       {/* Register Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-10 py-8">
+      <div className="glass-card rounded-2xl px-8 py-10 shadow-xl">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <InstagramLogo size="md" />
+          <AppLogo size="lg" />
         </div>
 
-        {/* Subtitle */}
-        <p className="text-center text-gray-500 font-semibold text-base mb-4">
-          Sign up to see photos and videos from your friends.
-        </p>
+        {/* Welcome Text */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
+            Join Connectify
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Create your account and start connecting
+          </p>
+        </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm text-center">
+            <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-xl text-destructive text-sm text-center">
               {error}
             </div>
           )}
 
           {/* Username Input */}
-          <input
-            {...register("username", { required: true })}
-            type="text"
-            placeholder="Username"
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-400 transition-colors placeholder-gray-500"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <User className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <input
+              {...register("username", { required: true })}
+              type="text"
+              placeholder="Username"
+              className="w-full pl-12 pr-4 py-3.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-muted-foreground"
+            />
+          </div>
 
           {/* Display Name Input */}
-          <input
-            {...register("displayname", { required: true })}
-            type="text"
-            placeholder="Full Name"
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-400 transition-colors placeholder-gray-500"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Mail className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <input
+              {...register("displayname", { required: true })}
+              type="text"
+              placeholder="Full Name"
+              className="w-full pl-12 pr-4 py-3.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-muted-foreground"
+            />
+          </div>
 
           {/* Phone Input */}
-          <input
-            {...register("phone", { required: true })}
-            type="tel"
-            placeholder="Phone Number"
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-400 transition-colors placeholder-gray-500"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Phone className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <input
+              {...register("phone", { required: true })}
+              type="tel"
+              placeholder="Phone Number"
+              className="w-full pl-12 pr-4 py-3.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-muted-foreground"
+            />
+          </div>
 
           {/* Password Input */}
-          <input
-            {...register("password", { required: true })}
-            type="password"
-            placeholder="Password"
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-400 transition-colors placeholder-gray-500"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Lock className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <input
+              {...register("password", { required: true })}
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              className="w-full pl-12 pr-12 py-3.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-muted-foreground"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
+          </div>
 
-          {/* Re-enter Password Input */}
-          <input
-            {...register("repassword", { required: true })}
-            type="password"
-            placeholder="Confirm Password"
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-400 transition-colors placeholder-gray-500"
-          />
+          {/* Confirm Password Input */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Lock className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <input
+              {...register("repassword", { required: true })}
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm Password"
+              className="w-full pl-12 pr-12 py-3.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-muted-foreground"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showConfirmPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+
+          {/* Password Requirements */}
+          <div className="space-y-2 p-3 bg-muted/30 rounded-xl">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Password requirements:</p>
+            <div className="flex items-center gap-2">
+              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordMinLength ? 'bg-green-500' : 'bg-muted'}`}>
+                {passwordMinLength && <Check className="w-3 h-3 text-white" />}
+              </div>
+              <span className={`text-xs ${passwordMinLength ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                At least 8 characters
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordsMatch ? 'bg-green-500' : 'bg-muted'}`}>
+                {passwordsMatch && <Check className="w-3 h-3 text-white" />}
+              </div>
+              <span className={`text-xs ${passwordsMatch ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                Passwords match
+              </span>
+            </div>
+          </div>
 
           {/* Terms */}
-          <p className="text-xs text-gray-500 text-center leading-relaxed">
+          <p className="text-xs text-muted-foreground text-center leading-relaxed">
             By signing up, you agree to our{" "}
-            <a href="#" className="text-blue-900 font-medium">
-              Terms
-            </a>
-            ,{" "}
-            <a href="#" className="text-blue-900 font-medium">
+            <Link href="#" className="text-primary hover:underline font-medium">
+              Terms of Service
+            </Link>
+            {" "}and{" "}
+            <Link href="#" className="text-primary hover:underline font-medium">
               Privacy Policy
-            </a>{" "}
-            and{" "}
-            <a href="#" className="text-blue-900 font-medium">
-              Cookies Policy
-            </a>
-            .
+            </Link>
           </p>
 
           {/* Sign Up Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-2.5 mt-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-semibold rounded-lg hover:opacity-90 focus:outline-none transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 bg-gradient-to-r from-primary via-secondary to-pink-500 text-white font-semibold rounded-xl hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed btn-glow flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
           >
             {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
                 Creating account...
-              </div>
+              </>
             ) : (
-              "Sign Up"
+              <>
+                Create Account
+                <ArrowRight className="w-5 h-5" />
+              </>
             )}
           </button>
         </form>
       </div>
 
       {/* Login Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-10 py-5 mt-3 text-center">
-        <p className="text-sm text-gray-800">
-          Have an account?{" "}
-          <a
+      <div className="glass-card rounded-2xl px-8 py-5 mt-4 text-center shadow-lg">
+        <p className="text-sm text-foreground">
+          Already have an account?{" "}
+          <Link
             href="/login"
-            className="text-blue-500 font-semibold hover:text-blue-600"
+            className="text-primary font-semibold hover:text-primary/80 transition-colors"
           >
-            Log in
-          </a>
+            Sign in
+          </Link>
         </p>
-      </div>
-
-      {/* App Download Section */}
-      <div className="mt-5">
-        <p className="text-center text-sm text-gray-800 mb-4">Get the App.</p>
-        <AppDownloadButtons />
       </div>
     </div>
   );

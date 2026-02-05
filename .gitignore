@@ -9,7 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
+.github
+.opencode
 # testing
 /coverage
 

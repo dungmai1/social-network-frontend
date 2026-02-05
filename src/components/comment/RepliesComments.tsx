@@ -90,7 +90,7 @@ function ReplyItem({
         <div className="flex-1">
           <div className="flex justify-between">
             <div className="text-sm flex-1">
-              <span className="font-semibold text-gray-900 mr-2">
+              <span className="font-semibold text-foreground hover:text-primary mr-2">
                 {reply.username}
               </span>
               {isEditing ? (
@@ -125,7 +125,7 @@ function ReplyItem({
                   </p>
                 </div>
               ) : (
-                <span className="text-gray-700">{reply.content}</span>
+                <span className="text-foreground/80">{reply.content}</span>
               )}
             </div>
             <div className="flex items-center gap-2">

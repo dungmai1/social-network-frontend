@@ -1,19 +1,38 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
+import {
+  MessageCircle,
+  Home,
+  Search,
+  PlusSquare,
+  Moon,
+  Sun,
+  Monitor,
+  LogOut,
+  Settings,
+  User,
+  ChevronDown,
+} from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { NotificationBell } from "@/components/notification";
 import { SearchBar } from "@/components/search";
+import { useTheme } from "@/providers/ThemeProvider";
+import useUser from "@/hooks/useUser";
 
 export default function Header() {
   const router = useRouter();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { userCurrent } = useUser();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const themeMenuRef = useRef<HTMLDivElement>(null);
 
   const handleLogOut = async () => {
     try {
-      // Dynamic import CometChat SDK only when needed
       const { CometChatUIKit } = await import("@cometchat/chat-uikit-react");
       await CometChatUIKit.logout();
       console.log("CometChat logout successful");
@@ -25,7 +44,6 @@ export default function Header() {
   };
 
   useEffect(() => {
-    // Dynamic import CometChat SDK only when component mounts
     import("@cometchat/chat-sdk-javascript").then(({ CometChat }) => {
       CometChat.getUnreadMessageCount()
         .then((res) => {
@@ -37,66 +55,225 @@ export default function Header() {
         });
     });
   }, []);
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+      if (
+        themeMenuRef.current &&
+        !themeMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowThemeMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const ThemeIcon = () => {
+    if (theme === "system") return <Monitor size={18} />;
+    if (resolvedTheme === "dark") return <Moon size={18} />;
+    return <Sun size={18} />;
+  };
+
   return (
-    <header className="w-full border-b border-gray-200 bg-white sticky top-0 z-30">
-      <div className="mx-auto px-4 lg:px-6 py-3 flex items-center justify-between max-w-7xl">
-        {/* Logo */}
-        <div className="flex items-center">
-          <Link href="/">
-            <img
-              src="/insta-logo.svg"
-              alt="Instagram"
-              className="h-8 hidden sm:block"
-            />
-            <svg
-              className="w-7 h-7 sm:hidden"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+    <header className="sticky top-0 z-50 w-full">
+      {/* Floating Navbar Container */}
+      <div className="mx-auto max-w-7xl px-4 pt-3">
+        <nav className="glass-card rounded-2xl shadow-lg px-4 lg:px-6 py-3">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex items-center gap-2 group cursor-pointer"
             >
-              <rect x="2" y="2" width="20" height="20" rx="5" />
-              <circle cx="12" cy="12" r="4" />
-              <circle cx="18" cy="6" r="1.5" fill="currentColor" />
-            </svg>
-          </Link>
-        </div>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                <svg
+                  className="w-5 h-5 text-white"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="18" cy="6" r="1.5" fill="currentColor" />
+                </svg>
+              </div>
+              <span className="hidden sm:block text-xl font-bold font-heading gradient-text">
+                SocialHub
+              </span>
+            </Link>
 
-        {/* Search */}
-        <div className="hidden md:block">
-          <SearchBar />
-        </div>
+            {/* Search - Desktop */}
+            <div className="hidden md:block flex-1 max-w-md mx-8">
+              <SearchBar />
+            </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-1">
-          <Link href="/" className="hidden md:block">
-            <button className="p-2 rounded-lg hover:bg-gray-100 transition">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9.005 16.545a2.997 2.997 0 012.997-2.997h0A2.997 2.997 0 0115 16.545V22h7V11.543L12 2 2 11.543V22h7.005z" />
-              </svg>
-            </button>
-          </Link>
+            {/* Actions */}
+            <div className="flex items-center gap-1">
+              {/* Home */}
+              <Link href="/">
+                <button className="p-2.5 rounded-xl hover:bg-accent/50 text-foreground transition-colors cursor-pointer">
+                  <Home size={22} />
+                </button>
+              </Link>
 
-          <Link href="/message" className="hidden md:block">
-            <button className="p-2 rounded-lg hover:bg-gray-100 transition relative">
-              <MessageCircle size={24} className="text-gray-800" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
-            </button>
-          </Link>
+              {/* Messages */}
+              <Link href="/message" className="hidden sm:block">
+                <button className="p-2.5 rounded-xl hover:bg-accent/50 text-foreground transition-colors relative cursor-pointer">
+                  <MessageCircle size={22} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 pulse-dot">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+              </Link>
 
-          <NotificationBell />
+              {/* Notifications */}
+              <NotificationBell />
 
-          <button
-            onClick={() => handleLogOut()}
-            className="ml-2 px-4 py-1.5 text-sm font-semibold text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-          >
-            Log out
-          </button>
-        </div>
+              {/* Theme Toggle */}
+              <div className="relative" ref={themeMenuRef}>
+                <button
+                  onClick={() => setShowThemeMenu(!showThemeMenu)}
+                  className="p-2.5 rounded-xl hover:bg-accent/50 text-foreground transition-colors cursor-pointer"
+                  aria-label="Toggle theme"
+                >
+                  <ThemeIcon />
+                </button>
+
+                {showThemeMenu && (
+                  <div className="absolute right-0 mt-2 w-40 glass-card rounded-xl shadow-xl overflow-hidden z-50">
+                    <button
+                      onClick={() => {
+                        setTheme("light");
+                        setShowThemeMenu(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent/50 transition-colors cursor-pointer ${
+                        theme === "light"
+                          ? "text-primary font-medium"
+                          : "text-foreground"
+                      }`}
+                    >
+                      <Sun size={16} />
+                      Light
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTheme("dark");
+                        setShowThemeMenu(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent/50 transition-colors cursor-pointer ${
+                        theme === "dark"
+                          ? "text-primary font-medium"
+                          : "text-foreground"
+                      }`}
+                    >
+                      <Moon size={16} />
+                      Dark
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTheme("system");
+                        setShowThemeMenu(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent/50 transition-colors cursor-pointer ${
+                        theme === "system"
+                          ? "text-primary font-medium"
+                          : "text-foreground"
+                      }`}
+                    >
+                      <Monitor size={16} />
+                      System
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* User Menu */}
+              <div className="relative ml-1" ref={userMenuRef}>
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 p-1.5 pr-3 rounded-xl hover:bg-accent/50 transition-colors cursor-pointer"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-primary/30">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={
+                        userCurrent?.avatar ||
+                        `https://picsum.photos/seed/${userCurrent?.username || "user"}/100`
+                      }
+                      alt={userCurrent?.username || "User"}
+                    />
+                  </div>
+                  <ChevronDown
+                    size={14}
+                    className={`text-muted-foreground transition-transform ${showUserMenu ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-56 glass-card rounded-xl shadow-xl overflow-hidden z-50">
+                    {/* User Info */}
+                    <div className="px-4 py-3 border-b border-border">
+                      <p className="font-semibold text-foreground">
+                        {userCurrent?.displayname || userCurrent?.username}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        @{userCurrent?.username}
+                      </p>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-1">
+                      <Link
+                        href={`/profile/${userCurrent?.username}`}
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent/50 transition-colors cursor-pointer">
+                          <User size={16} />
+                          View Profile
+                        </button>
+                      </Link>
+                      <Link
+                        href="/settings"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent/50 transition-colors cursor-pointer">
+                          <Settings size={16} />
+                          Settings
+                        </button>
+                      </Link>
+                    </div>
+
+                    {/* Logout */}
+                    <div className="border-t border-border py-1">
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          handleLogOut();
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                      >
+                        <LogOut size={16} />
+                        Log out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </nav>
       </div>
     </header>
   );

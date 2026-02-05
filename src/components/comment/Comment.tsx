@@ -98,7 +98,7 @@ export default function Comment({
             <div className="text-sm flex-1">
               <div>
                 <Link href={`/profile/${comment.username}`}>
-                  <span className="font-semibold text-gray-900 mr-2">
+                  <span className="font-semibold text-foreground hover:text-primary mr-2">
                     {comment.username}
                   </span>
                 </Link>
@@ -135,7 +135,7 @@ export default function Comment({
                   </p>
                 </div>
               ) : (
-                <span className="text-gray-700">{comment.content}</span>
+                <span className="text-foreground/80">{comment.content}</span>
               )}
             </div>
             <div className="flex items-center gap-2">

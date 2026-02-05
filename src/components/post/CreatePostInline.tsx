@@ -6,8 +6,8 @@ import {
   Loader2,
   Upload,
   X,
-  ChevronDown,
-  ChevronUp,
+  Sparkles,
+  Camera,
 } from "lucide-react";
 import { useCreatePost } from "@/hooks/useCreatePost";
 import { buildFormData } from "@/lib/formdata";
@@ -74,7 +74,7 @@ export default function CreatePostInline({
 
   const disableSubmit = useMemo(
     () => !selectedFiles.length || isPending,
-    [selectedFiles.length, isPending],
+    [selectedFiles.length, isPending]
   );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -107,12 +107,12 @@ export default function CreatePostInline({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 w-full max-w-2xl overflow-hidden">
+    <div className="glass-card rounded-2xl overflow-hidden">
       <form onSubmit={handleSubmit}>
         {/* Header - Always visible */}
         <div className="p-5">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
+            <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-primary/30 flex-shrink-0">
               <img
                 src={
                   userAvatar ||
@@ -124,12 +124,13 @@ export default function CreatePostInline({
             </div>
             <div className="flex-1">
               <textarea
+                id="create-post-input"
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 onFocus={handleInputFocus}
                 placeholder="What's on your mind?"
                 rows={isExpanded ? 3 : 1}
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-gray-400 focus:outline-none resize-none transition-all"
+                className="w-full rounded-xl bg-muted/50 border border-border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-2 focus:ring-primary/20 focus:outline-none resize-none transition-all"
               />
             </div>
           </div>
@@ -139,18 +140,20 @@ export default function CreatePostInline({
         {isExpanded && (
           <div className="px-5 pb-5 space-y-4">
             {/* Image upload area */}
-            <div className="flex flex-col gap-3 rounded-2xl border-2 border-dashed border-gray-200 p-4 text-center">
-              <div className="flex flex-col items-center gap-2 text-gray-600">
-                <ImagePlus size={32} />
-                <p className="text-sm">
-                  Drag and drop or select multiple images to upload.
+            <div className="flex flex-col gap-4 rounded-2xl border-2 border-dashed border-border hover:border-primary/50 p-5 text-center transition-colors">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Camera size={24} className="text-primary" />
+                </div>
+                <p className="text-sm font-medium text-foreground">
+                  Add photos to your post
                 </p>
-                <p className="text-xs text-gray-400">
-                  Supports PNG, JPG, JPEG, WEBP.
+                <p className="text-xs text-muted-foreground">
+                  Drag and drop or click to select
                 </p>
               </div>
               <div>
-                <label className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-500 cursor-pointer transition">
+                <label className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary/90 cursor-pointer transition-colors btn-glow">
                   <Upload size={18} />
                   Choose images
                   <input
@@ -165,23 +168,24 @@ export default function CreatePostInline({
 
               {/* Image previews */}
               {previewUrls.length > 0 && (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 mt-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 mt-2">
                   {previewUrls.map((url, index) => (
                     <div
                       key={url}
-                      className="relative rounded-xl border border-gray-100 bg-gray-50 p-2"
+                      className="relative rounded-xl overflow-hidden bg-muted/30 group"
                     >
                       <img
                         src={url}
                         alt={`preview-${index}`}
-                        className="h-32 w-full rounded-lg object-cover"
+                        className="h-32 w-full object-cover"
                       />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(index)}
-                        className="absolute right-2 top-2 rounded-full bg-white/80 p-1 text-gray-700 shadow hover:bg-white transition"
+                        className="absolute right-2 top-2 p-1.5 rounded-full bg-card/90 text-foreground shadow-md opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-all cursor-pointer"
                       >
-                        <X size={16} />
+                        <X size={14} />
                       </button>
                     </div>
                   ))}
@@ -190,28 +194,38 @@ export default function CreatePostInline({
             </div>
 
             {/* Error/Success messages */}
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && (
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/30">
+                <X size={16} className="text-destructive" />
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
             {successMessage && (
-              <p className="text-sm text-emerald-600">{successMessage}</p>
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/30">
+                <Sparkles size={16} className="text-green-500" />
+                <p className="text-sm text-green-600 dark:text-green-400">
+                  {successMessage}
+                </p>
+              </div>
             )}
 
             {/* Action buttons */}
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={handleCancel}
                 disabled={isPending}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition disabled:opacity-50"
+                className="px-5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={disableSubmit}
-                className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-xl shadow hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer btn-glow"
               >
                 {isPending && <Loader2 className="animate-spin" size={18} />}
-                Post
+                {isPending ? "Posting..." : "Post"}
               </button>
             </div>
           </div>
@@ -220,10 +234,10 @@ export default function CreatePostInline({
         {/* Toggle button when not expanded */}
         {!isExpanded && (
           <div className="px-5 pb-4 flex justify-between items-center">
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-emerald-600 transition">
-                <ImagePlus size={20} className="text-emerald-600" />
-                <span>Image</span>
+            <div className="flex gap-2">
+              <label className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm text-muted-foreground cursor-pointer hover:bg-accent/50 hover:text-foreground transition-colors">
+                <ImagePlus size={20} className="text-primary" />
+                <span>Photo</span>
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/jpg,image/webp"

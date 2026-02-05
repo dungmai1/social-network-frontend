@@ -1,6 +1,16 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Heart, MessageCircle, Send, MoreHorizontal, X } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Send,
+  Bookmark,
+  MoreHorizontal,
+  X,
+  Edit3,
+  Trash2,
+  Flag,
+} from "lucide-react";
 import { PostModel } from "@/types/post";
 import { formatDate } from "@/lib/date";
 import Comment from "@/components/comment/Comment";
@@ -92,10 +102,11 @@ export default function Post({
     setShowOptions(false);
     setError(null);
   };
+
   const handleDeleteClick = async () => {
     if (
       !window.confirm(
-        "Are you sure you want to delete this post? This action cannot be undone.",
+        "Are you sure you want to delete this post? This action cannot be undone."
       )
     ) {
       return;
@@ -108,7 +119,6 @@ export default function Post({
       await deletePost(post.id);
       setIsDeleted(true);
       setShowOptions(false);
-      // Call callback after UI update
       setTimeout(() => {
         onDeletePost?.(post.id);
       }, 300);
@@ -120,6 +130,7 @@ export default function Post({
       setIsLoading(false);
     }
   };
+
   const handleSaveEdit = async () => {
     if (!editedContent.trim()) {
       setError("Post content cannot be empty");
@@ -155,264 +166,285 @@ export default function Post({
     setEditedContent(currentPost.content);
     setError(null);
   };
+
   return (
     <div>
       {isDeleted && (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm p-4 text-center text-gray-500">
-          Post deleted successfully
+        <div className="glass-card rounded-2xl overflow-hidden p-6 text-center">
+          <p className="text-muted-foreground">Post deleted successfully</p>
         </div>
       )}
 
       {!isDeleted && (
-        <>
-          <article className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            {/* Header */}
-            <div className="flex items-center gap-3 p-4 relative">
-              <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
-                <Link href={`/profile/${post.username}`}>
-                  <img
-                    src={post.avatar}
-                    alt={post.username}
-                    className="w-full h-full object-cover"
-                  />
-                </Link>
+        <article className="glass-card rounded-2xl overflow-hidden hover-lift">
+          {/* Header */}
+          <div className="flex items-center gap-3 p-4 relative">
+            <Link href={`/profile/${post.username}`}>
+              <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-primary/20 hover:ring-primary/40 transition-all cursor-pointer">
+                <img
+                  src={post.avatar}
+                  alt={post.username}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-gray-900">
-                  <Link href={`/profile/${post.username}`}>
-                    <span>{post.username}</span>
-                  </Link>
-                </div>
-                <div className="text-xs text-gray-500">
-                  {formatDate(post.postTime)}
-                </div>
-              </div>
-              <button
-                className="p-1 rounded-full hover:bg-gray-100 transition"
-                onClick={() => setShowOptions((prev) => !prev)}
+            </Link>
+            <div className="flex-1 min-w-0">
+              <Link href={`/profile/${post.username}`}>
+                <p className="text-sm font-semibold text-foreground hover:text-primary transition-colors cursor-pointer">
+                  {post.username}
+                </p>
+              </Link>
+              <p className="text-xs text-muted-foreground">
+                {formatDate(post.postTime)}
+              </p>
+            </div>
+            <button
+              className="p-2 rounded-xl hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              onClick={() => setShowOptions((prev) => !prev)}
+            >
+              <MoreHorizontal size={20} />
+            </button>
+
+            {/* Options Menu */}
+            {showOptions && (
+              <div
+                ref={menuRef}
+                className="absolute top-14 right-4 w-52 glass-card rounded-xl shadow-xl overflow-hidden z-20"
               >
-                <MoreHorizontal size={20} className="text-gray-600" />
-              </button>
-              {showOptions && (
-                <div
-                  ref={menuRef}
-                  className="absolute top-12 right-4 w-60 rounded-2xl bg-[#1d1d1d] text-white shadow-2xl border border-gray-700 overflow-hidden z-20"
+                <button
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-accent/50 transition-colors cursor-pointer disabled:opacity-50"
+                  onClick={() => handleAddFavorite()}
+                  disabled={isLoading}
                 >
-                  <div className="divide-y divide-gray-800">
+                  <Bookmark
+                    size={16}
+                    className={saved ? "fill-primary text-primary" : ""}
+                  />
+                  {saved ? "Saved" : "Save post"}
+                </button>
+                {isOwner && (
+                  <>
                     <button
-                      className="w-full text-left px-4 py-3 text-sm font-medium text-gray-200 hover:bg-[#2c2c2c] transition disabled:opacity-50"
-                      onClick={() => handleAddFavorite()}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-accent/50 transition-colors cursor-pointer disabled:opacity-50"
+                      onClick={handleEditClick}
                       disabled={isLoading}
                     >
-                      {saved ? "Saved" : "Add to favorites"}
+                      <Edit3 size={16} />
+                      Edit post
                     </button>
-                    {isOwner && (
-                      <>
-                        <button
-                          className="w-full text-left px-4 py-3 text-sm font-medium text-gray-200 hover:bg-[#2c2c2c] transition disabled:opacity-50"
-                          onClick={handleEditClick}
-                          disabled={isLoading}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="w-full text-left px-4 py-3 text-sm font-medium text-red-500 hover:bg-[#2c2c2c] transition disabled:opacity-50"
-                          onClick={handleDeleteClick}
-                          disabled={isLoading}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
                     <button
-                      className="w-full text-left px-4 py-3 text-sm font-medium text-gray-200 hover:bg-[#2c2c2c] transition"
-                      onClick={() => setShowOptions(false)}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer disabled:opacity-50"
+                      onClick={handleDeleteClick}
+                      disabled={isLoading}
                     >
-                      Cancel
+                      <Trash2 size={16} />
+                      Delete post
                     </button>
-                  </div>
-                </div>
-              )}
-            </div>
+                  </>
+                )}
+                {!isOwner && (
+                  <button className="w-full flex items-center gap-3 px-4 py-3 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer">
+                    <Flag size={16} />
+                    Report post
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
 
-            {/* Image */}
-            <div className="relative w-full aspect-square bg-gray-100">
-              {post.images &&
-              Array.isArray(post.images) &&
-              post.images.length > 0 ? (
-                <Carousel className="w-full h-full">
-                  <CarouselContent>
-                    {post.images.map((img, i) => (
-                      <CarouselItem
-                        key={i}
-                        className="flex items-center justify-center"
-                      >
-                        <img
-                          src={img}
-                          alt={`post-img-${i}`}
-                          className="w-full h-full object-contain rounded"
-                          style={{ maxHeight: "400px", maxWidth: "100%" }}
-                        />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  {hasMultiple && (
-                    <>
-                      <CarouselPrevious className="left-2" />
-                      <CarouselNext className="right-2" />
-                    </>
-                  )}
-                </Carousel>
-              ) : (
-                <span className="text-gray-400">No image</span>
-              )}
-            </div>
+          {/* Image Carousel */}
+          <div className="relative w-full aspect-square bg-muted/30">
+            {post.images && Array.isArray(post.images) && post.images.length > 0 ? (
+              <Carousel className="w-full h-full">
+                <CarouselContent>
+                  {post.images.map((img, i) => (
+                    <CarouselItem
+                      key={i}
+                      className="flex items-center justify-center"
+                    >
+                      <img
+                        src={img}
+                        alt={`post-img-${i}`}
+                        className="w-full h-full object-contain"
+                        style={{ maxHeight: "500px", maxWidth: "100%" }}
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {hasMultiple && (
+                  <>
+                    <CarouselPrevious className="left-3 bg-card/80 hover:bg-card border-border" />
+                    <CarouselNext className="right-3 bg-card/80 hover:bg-card border-border" />
+                  </>
+                )}
+              </Carousel>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-muted-foreground">No image</span>
+              </div>
+            )}
+          </div>
 
-            {/* Actions */}
-            <div className="p-3">
-              <div className="flex items-center gap-3 mb-2">
+          {/* Actions */}
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={() => {
-                    handleClickLike(post.id);
-                  }}
-                  className="p-1 rounded-lg hover:bg-gray-100 transition"
+                  onClick={() => handleClickLike(post.id)}
+                  className={`p-2 rounded-xl transition-all cursor-pointer ${
+                    isLiked
+                      ? "text-red-500 bg-red-500/10"
+                      : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                  }`}
                 >
                   <Heart
                     size={22}
-                    fill={isLiked ? "#ef4444" : "none"}
-                    stroke={isLiked ? "#ef4444" : "#374151"}
-                    className="transition-colors"
+                    fill={isLiked ? "currentColor" : "none"}
+                    className={isLiked ? "animate-pulse" : ""}
                   />
                 </button>
                 <button
-                  className="p-1 rounded-lg hover:bg-gray-100 transition"
+                  className="p-2 rounded-xl hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   onClick={() => handleShowComment()}
                 >
-                  <MessageCircle size={22} className="text-gray-700" />
+                  <MessageCircle size={22} />
                 </button>
-                <button className="p-1 rounded-lg hover:bg-gray-100 transition">
-                  <Send size={22} className="text-gray-700" />
+                <button className="p-2 rounded-xl hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                  <Send size={22} />
                 </button>
               </div>
+              <button
+                onClick={() => handleAddFavorite()}
+                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                  saved
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                }`}
+              >
+                <Bookmark size={22} fill={saved ? "currentColor" : "none"} />
+              </button>
+            </div>
 
-              {/* Likes */}
-              <div className="text-sm font-semibold text-gray-900 mb-2">
-                {likeCount === 0 || likeCount === 1
-                  ? likeCount + " like"
-                  : likeCount + " likes"}
-              </div>
+            {/* Likes */}
+            <p className="text-sm font-semibold text-foreground mb-2">
+              {likeCount === 0 || likeCount === 1
+                ? likeCount + " like"
+                : likeCount.toLocaleString() + " likes"}
+            </p>
 
-              {/* Caption */}
-              <div className="text-sm mb-2">
-                <Link href={`/profile/${currentPost.username}`}>
-                  <span className="font-semibold text-gray-900 mr-2">
-                    {currentPost.username}
-                  </span>
-                </Link>
-                {isEditing ? (
-                  <div className="mt-2">
-                    {error && (
-                      <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-2 text-sm">
-                        {error}
-                      </div>
-                    )}
-                    <textarea
-                      value={editedContent}
-                      onChange={(e) => setEditedContent(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSaveEdit();
-                        }
-                        if (e.key === "Escape") {
-                          handleCancelEdit();
-                        }
-                      }}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                      rows={3}
-                      autoFocus
-                      disabled={isLoading}
-                      placeholder="What's on your mind?"
-                    />
-                    <div className="flex gap-2 mt-2">
+            {/* Caption */}
+            <div className="text-sm mb-3">
+              <Link href={`/profile/${currentPost.username}`}>
+                <span className="font-semibold text-foreground hover:text-primary transition-colors mr-2 cursor-pointer">
+                  {currentPost.username}
+                </span>
+              </Link>
+              {isEditing ? (
+                <div className="mt-2">
+                  {error && (
+                    <div className="bg-destructive/10 border border-destructive/30 text-destructive px-3 py-2 rounded-lg mb-2 text-sm">
+                      {error}
+                    </div>
+                  )}
+                  <textarea
+                    value={editedContent}
+                    onChange={(e) => setEditedContent(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSaveEdit();
+                      }
+                      if (e.key === "Escape") {
+                        handleCancelEdit();
+                      }
+                    }}
+                    className="w-full px-4 py-3 text-sm bg-muted/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-foreground placeholder:text-muted-foreground"
+                    rows={3}
+                    autoFocus
+                    disabled={isLoading}
+                    placeholder="What's on your mind?"
+                  />
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-xs text-muted-foreground">
+                      Press Enter to save · Esc to cancel
+                    </p>
+                    <div className="flex gap-2">
                       <button
                         onClick={handleCancelEdit}
                         disabled={isLoading}
-                        className="text-xs text-gray-500 hover:text-gray-700"
+                        className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleSaveEdit}
                         disabled={isLoading || !editedContent.trim()}
-                        className="text-xs text-blue-500 font-semibold hover:text-blue-700 disabled:opacity-50"
+                        className="px-4 py-1.5 text-xs bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 cursor-pointer"
                       >
                         {isLoading ? "Saving..." : "Save"}
                       </button>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Press Enter to save • Esc to cancel
-                    </p>
                   </div>
-                ) : (
-                  <span className="text-gray-700">
-                    {currentPost.content || ""}
-                  </span>
-                )}
-              </div>
+                </div>
+              ) : (
+                <span className="text-foreground/80">{currentPost.content || ""}</span>
+              )}
+            </div>
 
-              {/* Comments */}
-              <div
-                className="text-xs text-gray-500 mb-3 cursor-pointer hover:text-gray-700 transition"
+            {/* Comments Toggle */}
+            {commentCount > 0 && (
+              <button
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors mb-3 cursor-pointer"
                 onClick={() => handleShowComment()}
               >
-                {commentCount == 0
-                  ? ""
-                  : showComments
-                    ? "Hide comments"
-                    : `View all ${commentCount} comments`}
-              </div>
+                {showComments
+                  ? "Hide comments"
+                  : `View all ${commentCount} comments`}
+              </button>
+            )}
 
-              {showComments && comments && (
-                <div className="space-y-3 mb-3">
-                  {comments.map((comment) => (
-                    <Comment
-                      key={comment.id}
-                      post={post}
-                      comment={comment}
-                      onReply={handleClickReply}
-                      onDelete={handleDeleteComment}
-                      onEdit={handleEditComment}
-                    />
-                  ))}
-                </div>
-              )}
-              {/* Add Comment */}
-              <div className="border-t border-gray-100 pt-3">
-                <form
-                  className="flex items-center gap-3"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleAddComment(post.id);
-                  }}
-                >
-                  <input
-                    className="flex-1 outline-none text-sm text-gray-700 placeholder-gray-500"
-                    placeholder="Add a comment..."
-                    value={commentInput}
-                    onChange={(e) => setCommentInput(e.target.value)}
+            {/* Comments List */}
+            {showComments && comments && (
+              <div className="space-y-3 mb-4 max-h-60 overflow-y-auto scrollbar-thin">
+                {comments.map((comment) => (
+                  <Comment
+                    key={comment.id}
+                    post={post}
+                    comment={comment}
+                    onReply={handleClickReply}
+                    onDelete={handleDeleteComment}
+                    onEdit={handleEditComment}
                   />
-                  <button
-                    type="submit"
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900 transition"
-                  >
-                    Post
-                  </button>
-                </form>
+                ))}
               </div>
+            )}
+
+            {/* Add Comment */}
+            <div className="border-t border-border pt-3">
+              <form
+                className="flex items-center gap-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddComment(post.id);
+                }}
+              >
+                <input
+                  className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                  placeholder="Add a comment..."
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  disabled={!commentInput.trim()}
+                  className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Post
+                </button>
+              </form>
             </div>
-          </article>
-        </>
+          </div>
+        </article>
       )}
     </div>
   );

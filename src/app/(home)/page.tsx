@@ -5,12 +5,14 @@ import {
   Heart,
   MessageCircle,
   Search,
-  Clapperboard,
   Home as HomeIcon,
   Compass,
   User,
   Film,
   Plus,
+  TrendingUp,
+  Users,
+  Sparkles,
 } from "lucide-react";
 import Post from "@/components/post/Post";
 import { usePost } from "@/hooks/usePost";
@@ -45,7 +47,7 @@ export default function Home() {
     () => ({
       data: allPostsPages?.pages?.flatMap((page) => page?.data ?? []) ?? [],
     }),
-    [allPostsPages],
+    [allPostsPages]
   );
   const triggerRef = useRef(null);
 
@@ -62,7 +64,7 @@ export default function Home() {
         console.error("Failed to save post", error);
       }
     },
-    [savePostMutation],
+    [savePostMutation]
   );
 
   useIntersectionObserver({
@@ -71,21 +73,38 @@ export default function Home() {
     enabled: !!hasNextPage,
     threshold: 0,
   });
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header />
-      <main className="mx-auto px-4 lg:px-8 pt-6 pb-20 grid grid-cols-1 lg:grid-cols-[240px_1fr_320px] gap-6 max-w-7xl">
+      <main className="mx-auto px-4 lg:px-8 pt-6 pb-24 grid grid-cols-1 lg:grid-cols-[260px_1fr_320px] gap-8 max-w-7xl">
         {/* SIDEBAR LEFT */}
         <aside className="hidden lg:block">
-          <nav className="sticky top-20 space-y-1 py-4">
-            <SidebarItem icon={<HomeIcon size={24} />} label="Home" active />
-            <Link href="/message">
-              <SidebarItem
-                icon={<MessageCircle size={24} />}
-                label="Messages"
-              />
-            </Link>
-            <a
+          <nav className="sticky top-28 space-y-2 py-4">
+            <SidebarItem
+              icon={<HomeIcon size={22} />}
+              label="Home"
+              active
+              href="/"
+            />
+            <SidebarItem
+              icon={<Compass size={22} />}
+              label="Explore"
+              href="/explore"
+            />
+            <SidebarItem
+              icon={<MessageCircle size={22} />}
+              label="Messages"
+              href="/message"
+            />
+            <SidebarItem
+              icon={<Heart size={22} />}
+              label="Notifications"
+              href="/notifications"
+            />
+            <SidebarItem
+              icon={<Plus size={22} />}
+              label="Create Post"
               href="#create-post"
               onClick={(e) => {
                 e.preventDefault();
@@ -94,28 +113,45 @@ export default function Home() {
                   ?.scrollIntoView({ behavior: "smooth" });
                 document.getElementById("create-post-input")?.focus();
               }}
-            >
-              <SidebarItem icon={<Plus size={24} />} label="Create" />
-            </a>
-            <Link href={`/profile/${userCurrent?.username}`}>
-              <div className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-gray-100 transition cursor-pointer group">
-                <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-gray-300 transition">
-                  <img
-                    className="w-full h-full object-cover"
-                    src={userCurrent?.avatar}
-                    alt={userCurrent?.username || "User"}
-                  />
+            />
+            <SidebarItem
+              icon={<User size={22} />}
+              label="Profile"
+              href={`/profile/${userCurrent?.username}`}
+              avatar={userCurrent?.avatar}
+            />
+
+            {/* Divider */}
+            <div className="my-4 border-t border-border" />
+
+            {/* Quick Stats */}
+            <div className="glass-card rounded-xl p-4 space-y-3">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <TrendingUp size={16} className="text-primary" />
+                Quick Stats
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-2 rounded-lg bg-accent/30">
+                  <p className="text-lg font-bold text-foreground">
+                    {allPosts?.data?.length || 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Posts</p>
                 </div>
-                <span className="font-normal text-gray-900">Profile</span>
+                <div className="text-center p-2 rounded-lg bg-accent/30">
+                  <p className="text-lg font-bold text-foreground">
+                    {listRecommend?.length || 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Suggestions</p>
+                </div>
               </div>
-            </Link>
+            </div>
           </nav>
         </aside>
 
         {/* FEED CENTER */}
-        <section className="w-full max-w-[470px] mx-auto">
+        <section className="w-full max-w-[520px] mx-auto">
           {/* Create Post */}
-          <div id="create-post" className="mb-4">
+          <div id="create-post" className="mb-6">
             <CreatePostInline
               userAvatar={userCurrent?.avatar}
               username={userCurrent?.username}
@@ -123,25 +159,25 @@ export default function Home() {
           </div>
 
           {/* Posts Feed */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {isAllLoading ? (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
+                    className="glass-card rounded-2xl p-4 animate-pulse"
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-200" />
-                      <div className="space-y-2">
-                        <div className="h-3 w-24 bg-gray-200 rounded" />
-                        <div className="h-2 w-16 bg-gray-100 rounded" />
+                      <div className="w-12 h-12 rounded-full bg-muted" />
+                      <div className="space-y-2 flex-1">
+                        <div className="h-3 w-28 bg-muted rounded-full" />
+                        <div className="h-2 w-20 bg-muted/50 rounded-full" />
                       </div>
                     </div>
-                    <div className="aspect-square bg-gray-100 rounded-lg mb-4" />
+                    <div className="aspect-square bg-muted/50 rounded-xl mb-4" />
                     <div className="space-y-2">
-                      <div className="h-3 w-full bg-gray-200 rounded" />
-                      <div className="h-3 w-2/3 bg-gray-200 rounded" />
+                      <div className="h-3 w-full bg-muted rounded-full" />
+                      <div className="h-3 w-2/3 bg-muted/50 rounded-full" />
                     </div>
                   </div>
                 ))}
@@ -152,11 +188,19 @@ export default function Home() {
               ))
             )}
             {isAllError && (
-              <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-                <p className="text-gray-500 mb-4">Could not load posts</p>
+              <div className="glass-card rounded-2xl p-8 text-center">
+                <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+                  <Sparkles size={28} className="text-destructive" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Could not load posts
+                </h3>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Something went wrong. Please try again.
+                </p>
                 <button
                   onClick={() => refetchAll()}
-                  className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition"
+                  className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-colors cursor-pointer"
                 >
                   Try again
                 </button>
@@ -168,8 +212,13 @@ export default function Home() {
           {allPosts?.data && allPosts?.data?.length > 0 && (
             <>
               {isFetchingNextPage && (
-                <div className="flex justify-center py-6">
-                  <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                <div className="flex justify-center py-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                    <span className="text-sm text-muted-foreground">
+                      Loading more...
+                    </span>
+                  </div>
                 </div>
               )}
               <div ref={triggerRef}></div>
@@ -179,95 +228,95 @@ export default function Home() {
 
         {/* SIDEBAR RIGHT */}
         <aside className="hidden xl:block">
-          <div className="sticky top-20 space-y-5 py-4">
-            {/* Current User */}
-            <div className="flex items-center justify-between">
+          <div className="sticky top-28 space-y-6 py-4">
+            {/* Current User Card */}
+            <div className="glass-card rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full overflow-hidden">
-                  <img
-                    src={userCurrent?.avatar}
-                    alt={userCurrent?.username || "User"}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
+                <Link href={`/profile/${userCurrent?.username}`}>
+                  <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-primary/30 hover:ring-primary transition-all cursor-pointer">
+                    <img
+                      src={userCurrent?.avatar}
+                      alt={userCurrent?.username || "User"}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </Link>
+                <div className="flex-1 min-w-0">
                   <Link href={`/profile/${userCurrent?.username}`}>
-                    <p className="text-sm font-semibold text-gray-900 hover:underline">
+                    <p className="font-semibold text-foreground hover:text-primary transition-colors truncate cursor-pointer">
                       {userCurrent?.username}
                     </p>
                   </Link>
-                  <p className="text-sm text-gray-400">
-                    {userCurrent?.displayname || userCurrent?.username}
+                  <p className="text-sm text-muted-foreground truncate">
+                    {userCurrent?.displayname || "Welcome back!"}
                   </p>
                 </div>
               </div>
-              <button className="text-xs font-semibold text-blue-500 hover:text-blue-700">
-                Switch
-              </button>
             </div>
 
             {/* Suggestions */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-gray-500">
+            <div className="glass-card rounded-2xl overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <Users size={18} className="text-primary" />
                   Suggested for you
-                </span>
+                </h3>
                 <button
-                  className="text-xs font-semibold text-gray-900 hover:text-gray-600"
+                  className="text-xs font-medium text-primary hover:text-primary/80 transition-colors cursor-pointer"
                   onClick={handleRecommendUser}
                 >
                   Refresh
                 </button>
               </div>
 
-              <div className="space-y-3">
+              <div className="p-2">
                 {isLoadingRecommend ? (
-                  <div className="space-y-3">
+                  <div className="space-y-1">
                     {[...Array(5)].map((_, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center justify-between animate-pulse"
+                        className="flex items-center justify-between p-3 animate-pulse"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-full bg-gray-200" />
+                          <div className="w-11 h-11 rounded-full bg-muted" />
                           <div className="space-y-1.5">
-                            <div className="h-3 w-24 bg-gray-200 rounded" />
-                            <div className="h-2.5 w-20 bg-gray-100 rounded" />
+                            <div className="h-3 w-24 bg-muted rounded-full" />
+                            <div className="h-2.5 w-20 bg-muted/50 rounded-full" />
                           </div>
                         </div>
-                        <div className="h-4 w-12 bg-gray-100 rounded" />
+                        <div className="h-8 w-16 bg-muted rounded-lg" />
                       </div>
                     ))}
                   </div>
                 ) : listRecommend.length > 0 ? (
-                  <ul className="space-y-3">
+                  <ul className="space-y-1">
                     {listRecommend.map((suggestion) => {
                       const isFollowed = followedUsers.includes(
-                        suggestion.username,
+                        suggestion.username
                       );
                       return (
                         <li
                           key={suggestion.id ?? suggestion.username}
-                          className="flex items-center justify-between"
+                          className="flex items-center justify-between p-3 rounded-xl hover:bg-accent/30 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
                             <Link href={`/profile/${suggestion.username}`}>
                               <img
                                 src={
                                   suggestion.avatar ||
                                   `https://picsum.photos/seed/${suggestion.username}/44`
                                 }
-                                className="w-11 h-11 rounded-full object-cover"
+                                className="w-11 h-11 rounded-full object-cover ring-2 ring-transparent hover:ring-primary/30 transition-all cursor-pointer"
                                 alt={suggestion.username}
                               />
                             </Link>
-                            <div>
+                            <div className="min-w-0">
                               <Link href={`/profile/${suggestion.username}`}>
-                                <p className="text-sm font-semibold text-gray-900 hover:underline">
+                                <p className="text-sm font-semibold text-foreground hover:text-primary transition-colors truncate cursor-pointer">
                                   {suggestion.username}
                                 </p>
                               </Link>
-                              <p className="text-xs text-gray-400">
+                              <p className="text-xs text-muted-foreground truncate">
                                 {suggestion.displayname || "Suggested for you"}
                               </p>
                             </div>
@@ -277,10 +326,10 @@ export default function Home() {
                               !isFollowed &&
                               handleAddFollow(suggestion.username)
                             }
-                            className={`text-xs font-semibold ${
+                            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                               isFollowed
-                                ? "text-gray-500 cursor-default"
-                                : "text-blue-500 hover:text-blue-700"
+                                ? "bg-muted text-muted-foreground"
+                                : "bg-primary text-primary-foreground hover:bg-primary/90"
                             }`}
                           >
                             {isFollowed ? "Following" : "Follow"}
@@ -290,13 +339,18 @@ export default function Home() {
                     })}
                   </ul>
                 ) : (
-                  <div className="text-sm text-gray-400 text-center py-4">
-                    No suggestions available
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
+                      <Users size={20} className="text-muted-foreground" />
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      No suggestions available
+                    </p>
                     <button
-                      className="block w-full text-xs text-blue-500 font-semibold mt-2 hover:text-blue-700"
+                      className="text-xs text-primary font-semibold hover:text-primary/80 transition-colors cursor-pointer"
                       onClick={handleRecommendUser}
                     >
-                      Refresh
+                      Refresh suggestions
                     </button>
                   </div>
                 )}
@@ -304,61 +358,77 @@ export default function Home() {
             </div>
 
             {/* Footer Links */}
-            <div className="pt-6 space-y-4">
-              <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-gray-400">
-                <a href="#" className="hover:underline">
+            <div className="px-2 space-y-4">
+              <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                <a href="#" className="hover:text-foreground transition-colors">
                   About
                 </a>
                 <span>·</span>
-                <a href="#" className="hover:underline">
+                <a href="#" className="hover:text-foreground transition-colors">
                   Help
                 </a>
                 <span>·</span>
-                <a href="#" className="hover:underline">
+                <a href="#" className="hover:text-foreground transition-colors">
                   Press
                 </a>
                 <span>·</span>
-                <a href="#" className="hover:underline">
+                <a href="#" className="hover:text-foreground transition-colors">
                   API
                 </a>
                 <span>·</span>
-                <a href="#" className="hover:underline">
+                <a href="#" className="hover:text-foreground transition-colors">
                   Jobs
                 </a>
                 <span>·</span>
-                <a href="#" className="hover:underline">
+                <a href="#" className="hover:text-foreground transition-colors">
                   Privacy
                 </a>
                 <span>·</span>
-                <a href="#" className="hover:underline">
+                <a href="#" className="hover:text-foreground transition-colors">
                   Terms
                 </a>
               </div>
-              <p className="text-xs text-gray-400">© 2026 Instagram Clone</p>
+              <p className="text-xs text-muted-foreground">
+                © 2026 SocialHub. Built with Next.js
+              </p>
             </div>
           </div>
         </aside>
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2 z-50">
-        <div className="flex items-center justify-around">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 glass border-t border-border px-6 py-2 z-50">
+        <div className="flex items-center justify-around max-w-md mx-auto">
           <Link href="/">
-            <div className="p-2">
-              <HomeIcon size={24} className="text-gray-900" />
+            <div className="p-3 rounded-xl bg-primary/10 text-primary cursor-pointer">
+              <HomeIcon size={24} />
             </div>
           </Link>
-          <div className="p-2">
-            <Search size={24} className="text-gray-600" />
-          </div>
-          <div className="p-2">
-            <Plus size={24} className="text-gray-600" />
-          </div>
-          <div className="p-2">
-            <Film size={24} className="text-gray-600" />
-          </div>
+          <Link href="/explore">
+            <div className="p-3 rounded-xl hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+              <Search size={24} />
+            </div>
+          </Link>
+          <a
+            href="#create-post"
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("create-post")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            <div className="p-3 rounded-xl bg-primary text-primary-foreground shadow-lg hover-lift cursor-pointer">
+              <Plus size={24} />
+            </div>
+          </a>
+          <Link href="/message">
+            <div className="p-3 rounded-xl hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+              <MessageCircle size={24} />
+            </div>
+          </Link>
           <Link href={`/profile/${userCurrent?.username}`}>
-            <div className="w-7 h-7 rounded-full overflow-hidden ring-1 ring-gray-900">
+            <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-primary/50 cursor-pointer">
               <img
                 className="w-full h-full object-cover"
                 src={userCurrent?.avatar}
@@ -377,19 +447,45 @@ function SidebarItem({
   icon,
   label,
   active = false,
+  href,
+  avatar,
+  onClick,
 }: {
   icon: React.ReactNode;
   label: string;
   active?: boolean;
+  href: string;
+  avatar?: string;
+  onClick?: (e: React.MouseEvent) => void;
 }) {
-  return (
+  const content = (
     <div
-      className={`flex items-center gap-4 px-3 py-3 rounded-lg transition cursor-pointer hover:bg-gray-100 ${
-        active ? "font-bold" : "font-normal"
+      className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all cursor-pointer ${
+        active
+          ? "bg-primary/10 text-primary font-semibold"
+          : "text-foreground hover:bg-accent/50"
       }`}
     >
-      <span className={active ? "text-gray-900" : "text-gray-700"}>{icon}</span>
-      <span className="text-gray-900">{label}</span>
+      {avatar ? (
+        <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-primary/30">
+          <img className="w-full h-full object-cover" src={avatar} alt={label} />
+        </div>
+      ) : (
+        <span className={active ? "text-primary" : "text-muted-foreground"}>
+          {icon}
+        </span>
+      )}
+      <span>{label}</span>
     </div>
   );
+
+  if (onClick) {
+    return (
+      <a href={href} onClick={onClick}>
+        {content}
+      </a>
+    );
+  }
+
+  return <Link href={href}>{content}</Link>;
 }

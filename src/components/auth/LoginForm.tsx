@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/services/auth.service";
-import InstagramLogo from "./InstagramLogo";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
+import AppLogo from "./AppLogo";
 import SocialLoginButtons from "./SocialLoginButtons";
-import AppDownloadButtons from "./AppDownloadButtons";
+import Link from "next/link";
 
 interface LoginFormData {
   username: string;
@@ -17,6 +18,7 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const { register, handleSubmit } = useForm<LoginFormData>({
     defaultValues: {
@@ -52,90 +54,133 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <div className="w-full max-w-md mx-auto">
       {/* Login Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-10 py-8">
+      <div className="glass-card rounded-2xl px-8 py-10 shadow-xl">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <InstagramLogo size="md" />
+          <AppLogo size="lg" />
+        </div>
+
+        {/* Welcome Text */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
+            Welcome back
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Sign in to continue to your community
+          </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm text-center">
+            <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-xl text-destructive text-sm text-center">
               {error}
             </div>
           )}
 
           {/* Username Input */}
-          <input
-            {...register("username", { required: true })}
-            type="text"
-            placeholder="Phone Number, Username, or Email"
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-400 transition-colors placeholder-gray-500"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Mail className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <input
+              {...register("username", { required: true })}
+              type="text"
+              placeholder="Email or Username"
+              className="w-full pl-12 pr-4 py-3.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-muted-foreground"
+            />
+          </div>
 
           {/* Password Input */}
-          <input
-            {...register("password", { required: true })}
-            type="password"
-            placeholder="Password"
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-400 transition-colors placeholder-gray-500"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Lock className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <input
+              {...register("password", { required: true })}
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              className="w-full pl-12 pr-12 py-3.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-muted-foreground"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+
+          {/* Forgot Password */}
+          <div className="text-right">
+            <Link 
+              href="#" 
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              Forgot password?
+            </Link>
+          </div>
 
           {/* Login Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-2.5 mt-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-semibold rounded-lg hover:opacity-90 focus:outline-none transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 bg-gradient-to-r from-primary via-secondary to-pink-500 text-white font-semibold rounded-xl hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed btn-glow flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
           >
             {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
                 Signing in...
-              </div>
+              </>
             ) : (
-              "LOGIN"
+              <>
+                Sign In
+                <ArrowRight className="w-5 h-5" />
+              </>
             )}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="my-5 flex items-center">
-          <hr className="flex-1 border-gray-300" />
-          <span className="px-4 text-gray-500 text-xs font-medium">OR</span>
-          <hr className="flex-1 border-gray-300" />
+        <div className="my-6 flex items-center">
+          <hr className="flex-1 border-border" />
+          <span className="px-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">
+            or continue with
+          </span>
+          <hr className="flex-1 border-border" />
         </div>
 
         {/* Social Login */}
         <SocialLoginButtons />
-
-        {/* Forgot Password */}
-        <div className="text-center mt-5">
-          <a href="#" className="text-xs text-gray-800 hover:text-gray-600">
-            Forgot Password?
-          </a>
-        </div>
       </div>
 
       {/* Sign Up Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-10 py-5 mt-3 text-center">
-        <p className="text-sm text-gray-800">
-          Don't have an account?{" "}
-          <a
+      <div className="glass-card rounded-2xl px-8 py-5 mt-4 text-center shadow-lg">
+        <p className="text-sm text-foreground">
+          New to Connectify?{" "}
+          <Link
             href="/register"
-            className="text-blue-500 font-semibold hover:text-blue-600"
+            className="text-primary font-semibold hover:text-primary/80 transition-colors"
           >
-            Sign Up
-          </a>
+            Create an account
+          </Link>
         </p>
       </div>
 
-      {/* App Download Section */}
-      <div className="mt-5">
-        <p className="text-center text-sm text-gray-800 mb-4">Get the App.</p>
-        <AppDownloadButtons />
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-xs text-muted-foreground">
+          By signing in, you agree to our{" "}
+          <Link href="#" className="text-primary hover:underline">Terms</Link>
+          {" "}and{" "}
+          <Link href="#" className="text-primary hover:underline">Privacy Policy</Link>
+        </p>
       </div>
     </div>
   );

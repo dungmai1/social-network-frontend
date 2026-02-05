@@ -62,15 +62,15 @@ export default function NotificationDropdown({
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 top-full mt-2 w-96 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50"
+      className="absolute right-0 top-full mt-2 w-96 glass-card rounded-xl shadow-xl overflow-hidden z-50"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
-          <Bell size={18} className="text-gray-600" />
-          <span className="font-semibold text-gray-900">Notifications</span>
+          <Bell size={18} className="text-primary" />
+          <span className="font-semibold text-foreground">Notifications</span>
           {unreadCount > 0 && (
-            <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
               {unreadCount}
             </span>
           )}
@@ -78,7 +78,7 @@ export default function NotificationDropdown({
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 font-medium transition-colors cursor-pointer"
           >
             <Check size={14} />
             Mark all read
@@ -87,11 +87,19 @@ export default function NotificationDropdown({
       </div>
 
       {/* Notification list */}
-      <div className="max-h-[400px] overflow-y-auto" onScroll={handleScroll}>
+      <div
+        className="max-h-[400px] overflow-y-auto scrollbar-thin"
+        onScroll={handleScroll}
+      >
         {notifications.length === 0 && !loading ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-            <Bell size={40} className="text-gray-300 mb-3" />
-            <p className="text-sm">No notifications yet</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+              <Bell size={28} className="text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground">No notifications yet</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">
+              When you get notifications, they'll show up here
+            </p>
           </div>
         ) : (
           <>
@@ -105,11 +113,11 @@ export default function NotificationDropdown({
             ))}
             {loading && (
               <div className="flex items-center justify-center py-4">
-                <Loader2 size={24} className="animate-spin text-gray-400" />
+                <Loader2 size={20} className="animate-spin text-primary" />
               </div>
             )}
             {!hasMore && notifications.length > 0 && (
-              <div className="text-center py-4 text-sm text-gray-400">
+              <div className="text-center py-4 text-sm text-muted-foreground">
                 No more notifications
               </div>
             )}

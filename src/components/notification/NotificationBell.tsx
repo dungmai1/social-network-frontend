@@ -35,12 +35,12 @@ export default function NotificationBell() {
     <div className="relative">
       <button
         onClick={toggleDropdown}
-        className="p-2 rounded-lg hover:bg-gray-100 transition relative"
+        className="p-2.5 rounded-xl hover:bg-accent/50 text-foreground transition-colors relative cursor-pointer"
         aria-label="Notifications"
       >
-        <Bell size={20} className="text-gray-700" />
+        <Bell size={22} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
+          <span className="absolute top-1 right-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 pulse-dot">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
