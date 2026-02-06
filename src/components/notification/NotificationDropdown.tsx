@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 import { useNotification } from "@/hooks/useNotification";
 import NotificationItem from "./NotificationItem";
-import { Bell, Check, Loader2 } from "lucide-react";
+import { Bell, Check, Loader2, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -96,7 +97,9 @@ export default function NotificationDropdown({
             <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
               <Bell size={28} className="text-muted-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground">No notifications yet</p>
+            <p className="text-sm text-muted-foreground">
+              No notifications yet
+            </p>
             <p className="text-xs text-muted-foreground/70 mt-1">
               When you get notifications, they'll show up here
             </p>
@@ -124,6 +127,20 @@ export default function NotificationDropdown({
           </>
         )}
       </div>
+
+      {/* Footer - See All link */}
+      {notifications.length > 0 && (
+        <div className="border-t border-border">
+          <Link
+            href="/notifications"
+            onClick={onClose}
+            className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-primary hover:bg-accent/50 transition-colors"
+          >
+            See all notifications
+            <ExternalLink size={14} />
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
