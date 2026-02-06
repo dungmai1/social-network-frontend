@@ -20,7 +20,7 @@ import { MessageSquare, Users, Sparkles } from "lucide-react";
 const COMETCHAT_CONSTANTS = {
   APP_ID: process.env.NEXT_PUBLIC_COMETCHAT_APP_ID ?? "",
   REGION: process.env.NEXT_PUBLIC_COMETCHAT_REGION ?? "",
-  AUTH_KEY: process.env.NEXT_PUBLIC_COMETCHAT_AUTH_KEY ?? "",
+  AUTH_KEY: process.env.NEXT_PUBLIC_COMETCHAT_API_KEY ?? "",
 };
 
 interface CometChatNoSSRProps {

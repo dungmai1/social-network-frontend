@@ -63,6 +63,7 @@ export default function RegisterForm() {
         data.email,
         data.password,
       );
+      window.location.href = "/login";
     } catch (e: any) {
       setError(e?.message || "An error occurred, please try again");
       setIsLoading(false);
