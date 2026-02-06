@@ -2,14 +2,23 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { register as registerAccount } from "@/services/auth.service";
-import { User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, Loader2, Check } from "lucide-react";
+import {
+  User,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Loader2,
+  Check,
+} from "lucide-react";
 import AppLogo from "./AppLogo";
 import Link from "next/link";
 
 interface RegisterFormData {
   username: string;
   displayname: string;
-  phone: string;
+  email: string;
   password: string;
   repassword: string;
 }
@@ -24,7 +33,7 @@ export default function RegisterForm() {
     defaultValues: {
       username: "",
       displayname: "",
-      phone: "",
+      email: "",
       password: "",
       repassword: "",
     },
@@ -51,12 +60,11 @@ export default function RegisterForm() {
       await registerAccount(
         data.username,
         data.displayname,
-        data.phone,
+        data.email,
         data.password,
       );
     } catch (e: any) {
       setError(e?.message || "An error occurred, please try again");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -114,15 +122,15 @@ export default function RegisterForm() {
             />
           </div>
 
-          {/* Phone Input */}
+          {/* Email Input */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Phone className="w-5 h-5 text-muted-foreground" />
+              <Mail className="w-5 h-5 text-muted-foreground" />
             </div>
             <input
-              {...register("phone", { required: true })}
-              type="tel"
-              placeholder="Phone Number"
+              {...register("email", { required: true })}
+              type="email"
+              placeholder="Email Address"
               className="w-full pl-12 pr-4 py-3.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-muted-foreground"
             />
           </div>
@@ -177,20 +185,30 @@ export default function RegisterForm() {
 
           {/* Password Requirements */}
           <div className="space-y-2 p-3 bg-muted/30 rounded-xl">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Password requirements:</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">
+              Password requirements:
+            </p>
             <div className="flex items-center gap-2">
-              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordMinLength ? 'bg-green-500' : 'bg-muted'}`}>
+              <div
+                className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordMinLength ? "bg-green-500" : "bg-muted"}`}
+              >
                 {passwordMinLength && <Check className="w-3 h-3 text-white" />}
               </div>
-              <span className={`text-xs ${passwordMinLength ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+              <span
+                className={`text-xs ${passwordMinLength ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}`}
+              >
                 At least 8 characters
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordsMatch ? 'bg-green-500' : 'bg-muted'}`}>
+              <div
+                className={`w-4 h-4 rounded-full flex items-center justify-center ${passwordsMatch ? "bg-green-500" : "bg-muted"}`}
+              >
                 {passwordsMatch && <Check className="w-3 h-3 text-white" />}
               </div>
-              <span className={`text-xs ${passwordsMatch ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+              <span
+                className={`text-xs ${passwordsMatch ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}`}
+              >
                 Passwords match
               </span>
             </div>
@@ -201,8 +219,8 @@ export default function RegisterForm() {
             By signing up, you agree to our{" "}
             <Link href="#" className="text-primary hover:underline font-medium">
               Terms of Service
-            </Link>
-            {" "}and{" "}
+            </Link>{" "}
+            and{" "}
             <Link href="#" className="text-primary hover:underline font-medium">
               Privacy Policy
             </Link>

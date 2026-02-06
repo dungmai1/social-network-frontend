@@ -42,13 +42,13 @@ export default function LoginForm() {
         setIsLoading(false);
         return;
       }
-      
+
       // Redirect to intended page or home
       const intendedPath = searchParams.get("from") || "/";
       router.push(intendedPath);
+      // Keep isLoading true during redirect
     } catch (e: any) {
       setError(e.message || "An error occurred, please try again");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -119,8 +119,8 @@ export default function LoginForm() {
 
           {/* Forgot Password */}
           <div className="text-right">
-            <Link 
-              href="#" 
+            <Link
+              href="#"
               className="text-sm text-primary hover:text-primary/80 transition-colors"
             >
               Forgot password?
@@ -177,9 +177,13 @@ export default function LoginForm() {
       <div className="mt-8 text-center">
         <p className="text-xs text-muted-foreground">
           By signing in, you agree to our{" "}
-          <Link href="#" className="text-primary hover:underline">Terms</Link>
-          {" "}and{" "}
-          <Link href="#" className="text-primary hover:underline">Privacy Policy</Link>
+          <Link href="#" className="text-primary hover:underline">
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link href="#" className="text-primary hover:underline">
+            Privacy Policy
+          </Link>
         </p>
       </div>
     </div>
