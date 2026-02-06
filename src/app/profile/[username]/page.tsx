@@ -70,7 +70,7 @@ export default function ProfilePage({
   const { handleAddFollow, followersList, followingsList } =
     useRelationship(username);
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
-    "posts"
+    "posts",
   );
   const { postsByUserQuery, savedPostsByUserQuery, savePostMutation } =
     usePost(username);
@@ -91,11 +91,6 @@ export default function ProfilePage({
 
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [editValues, setEditValues] = useState({
-    displayName: userInfo?.username || "",
-    bio: userInfo?.description || "",
-  });
   const [showFollowersDialog, setShowFollowersDialog] = useState(false);
   const [showFollowingsDialog, setShowFollowingsDialog] = useState(false);
 
@@ -129,20 +124,7 @@ export default function ProfilePage({
 
   useEffect(() => {
     getUserInfo(username);
-    setEditValues({
-      displayName: userInfo?.username || "",
-      bio: userInfo?.description || "",
-    });
   }, [username]);
-
-  const handleEditProfile = useCallback(async () => {
-    try {
-      setShowEditDialog(false);
-      refetchUser();
-    } catch (error) {
-      console.error("Failed to edit profile", error);
-    }
-  }, [username, editValues, getUserInfo, refetchUser]);
 
   const handleAvatarChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,7 +135,7 @@ export default function ProfilePage({
         reader.readAsDataURL(file);
       }
     },
-    []
+    [],
   );
 
   return (
@@ -183,21 +165,6 @@ export default function ProfilePage({
                     className="w-full h-full object-cover"
                   />
                 </div>
-                {userInfo?.relationship.self && (
-                  <label
-                    htmlFor="avatar-upload-quick"
-                    className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg cursor-pointer hover:bg-primary/90 transition-colors"
-                  >
-                    <Camera size={18} />
-                    <input
-                      id="avatar-upload-quick"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarChange}
-                    />
-                  </label>
-                )}
               </div>
             </div>
 
@@ -224,12 +191,6 @@ export default function ProfilePage({
               <div className="flex flex-wrap justify-center sm:justify-start gap-2">
                 {userInfo?.relationship.self ? (
                   <>
-                    <button
-                      className="px-5 py-2 bg-muted hover:bg-accent text-foreground font-medium text-sm rounded-xl transition-colors cursor-pointer"
-                      onClick={() => setShowEditDialog(true)}
-                    >
-                      Edit profile
-                    </button>
                     <button
                       onClick={() => setShowShareDialog(true)}
                       className="px-5 py-2 bg-muted hover:bg-accent text-foreground font-medium text-sm rounded-xl transition-colors cursor-pointer"
@@ -282,7 +243,9 @@ export default function ProfilePage({
           {/* Stats */}
           <div className="flex justify-center sm:justify-start gap-8 mt-6 pt-6 border-t border-border">
             <div className="text-center">
-              <p className="text-2xl font-bold text-foreground">{stats.posts}</p>
+              <p className="text-2xl font-bold text-foreground">
+                {stats.posts}
+              </p>
               <p className="text-sm text-muted-foreground">Posts</p>
             </div>
             <button
@@ -531,7 +494,7 @@ export default function ProfilePage({
                       className="px-3 py-1.5 text-xs font-medium text-destructive border border-destructive/30 rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer"
                       onClick={() => {
                         handleAddFollow(follower.username).then(() =>
-                          getUserInfo(username)
+                          getUserInfo(username),
                         );
                       }}
                     >
@@ -588,7 +551,7 @@ export default function ProfilePage({
                       className="px-3 py-1.5 text-xs font-medium text-foreground border border-border rounded-lg hover:bg-accent transition-colors cursor-pointer"
                       onClick={() => {
                         handleAddFollow(user.username).then(() =>
-                          getUserInfo(username)
+                          getUserInfo(username),
                         );
                       }}
                     >
@@ -599,93 +562,6 @@ export default function ProfilePage({
               ))
             )}
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Profile Dialog */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="overflow-auto max-h-[80vh] glass-card">
-          <DialogTitle className="text-xl font-semibold">
-            Edit Profile
-          </DialogTitle>
-          <form className="space-y-6 mt-4">
-            {/* Avatar Upload */}
-            <div className="flex justify-center">
-              <div className="relative">
-                <img
-                  src={
-                    userInfo?.avatar ||
-                    "https://picsum.photos/seed/avatar/400/400"
-                  }
-                  alt="Avatar preview"
-                  className="rounded-full w-28 h-28 object-cover ring-4 ring-primary/20"
-                />
-                <label
-                  htmlFor="avatar-upload"
-                  className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg cursor-pointer hover:bg-primary/90 transition-colors"
-                >
-                  <Camera size={16} />
-                </label>
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
-              </div>
-            </div>
-
-            {/* Display Name */}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Display Name
-              </label>
-              <input
-                type="text"
-                className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                value={editValues.displayName}
-                onChange={(e) =>
-                  setEditValues((v) => ({ ...v, displayName: e.target.value }))
-                }
-                placeholder="Your display name"
-              />
-            </div>
-
-            {/* Bio */}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Bio
-              </label>
-              <textarea
-                className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                rows={4}
-                value={editValues.bio}
-                onChange={(e) =>
-                  setEditValues((v) => ({ ...v, bio: e.target.value }))
-                }
-                placeholder="Tell us about yourself..."
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowEditDialog(false)}
-                className="px-5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2.5 text-sm font-semibold bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors cursor-pointer"
-                onClick={handleEditProfile}
-              >
-                Save Changes
-              </button>
-            </div>
-          </form>
         </DialogContent>
       </Dialog>
     </div>

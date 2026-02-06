@@ -35,3 +35,18 @@ export async function searchUsers(textSearch: string) {
   const data = await res.json();
   return data;
 }
+
+export async function updateUser(formData: FormData) {
+  const res = await apiFetch(`${URL_BASE}/updateUser`, {
+    method: "PUT",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Failed to update user profile");
+  }
+
+  const data = await res.json();
+  return data;
+}

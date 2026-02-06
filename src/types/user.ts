@@ -4,14 +4,17 @@ export interface UserModel {
   username: string;
   displayname: string;
   avatar: string;
+  gmail: string;
+  phone: string;
+  description: string;
 }
 
 export interface RelationshipModel {
   followerCount: number;
   followingCount: number;
-  follower: boolean;  
-  following: boolean; 
-  self: boolean;      
+  follower: boolean;
+  following: boolean;
+  self: boolean;
 }
 
 export interface UserProfileModel {
