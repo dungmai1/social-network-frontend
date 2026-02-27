@@ -4,7 +4,7 @@ import { Chrome } from "lucide-react";
 
 export default function SocialLoginButtons() {
   const handleLoginGoogle = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"}/oauth2/authorization/google`;
   };
 
   return (
