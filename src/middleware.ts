@@ -5,8 +5,6 @@ const publicRoutes = ["/login", "/register"];
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("accessToken");
   const path = request.nextUrl.pathname;
-
-  // Skip middleware for static files and api routes
   if (
     path.startsWith("/_next") ||
     path.startsWith("/api") ||
@@ -18,15 +16,12 @@ export function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
   const isAuthenticated = !!token;
 
-  // Redirect unauthenticated users to login (except for public routes)
-  if (!isAuthenticated && !isPublicRoute) {
-    const loginUrl = new URL("/login", request.nextUrl);
-    return NextResponse.redirect(loginUrl);
+  if (isAuthenticated && isPublicRoute) {
+    return NextResponse.redirect(new URL("/", request.nextUrl));
   }
 
-  // Redirect authenticated users away from public routes (login/register)
-  // if (isAuthenticated && isPublicRoute) {
-  //   return NextResponse.redirect(new URL('/', request.nextUrl))
+  // if (!isAuthenticated && !isPublicRoute) {
+  //   return NextResponse.redirect(new URL("/login", request.nextUrl));
   // }
 
   return NextResponse.next();

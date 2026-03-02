@@ -25,7 +25,6 @@ export async function logout() {
   if (!res.ok) {
     throw new Error("Failed to logout");
   }
-  window.location.href = "/login";
 }
 async function registerCometChatUser(
   username: string,

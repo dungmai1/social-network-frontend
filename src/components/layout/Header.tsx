@@ -23,22 +23,32 @@ import useUser from "@/hooks/useUser";
 
 export default function Header() {
   const router = useRouter();
+  const { ClickLogout } = useUser();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { userCurrent } = useUser();
   const [unreadCount, setUnreadCount] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const themeMenuRef = useRef<HTMLDivElement>(null);
 
   const handleLogOut = async () => {
+    setIsLoggingOut(true);
     try {
       const { CometChatUIKit } = await import("@cometchat/chat-uikit-react");
-      await CometChatUIKit.logout();
-      console.log("CometChat logout successful");
-      router.push("/login");
+      await CometChatUIKit.logout().catch((e: any) =>
+        console.error("CometChat logout failed:", e),
+      );
+    } catch (e) {
+      console.error("CometChat import failed:", e);
+    }
+    try {
+      await ClickLogout();
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout API failed:", error);
+    } finally {
+      setIsLoggingOut(false);
       router.push("/login");
     }
   };
@@ -245,13 +255,17 @@ export default function Header() {
                     <div className="border-t border-border py-1">
                       <button
                         onClick={() => {
-                          setShowUserMenu(false);
+                          // setShowUserMenu(false);
                           handleLogOut();
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                        disabled={isLoggingOut}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <LogOut size={16} />
-                        Log out
+                        <LogOut
+                          size={16}
+                          className={isLoggingOut ? "animate-spin" : ""}
+                        />
+                        {isLoggingOut ? "Logging out..." : "Log out"}
                       </button>
                     </div>
                   </div>

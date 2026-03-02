@@ -37,6 +37,7 @@ type SettingsTab = "account" | "security" | "appearance" | "language" | "help";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { ClickLogout } = useUser();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { userCurrent } = useUser();
   const [activeTab, setActiveTab] = useState<SettingsTab>("account");
@@ -77,6 +78,7 @@ export default function SettingsPage() {
   );
   const [profileSuccess, setProfileSuccess] = useState("");
 
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [securitySettings, setSecuritySettings] = useState({
     twoFactorEnabled: false,
     loginAlerts: true,
@@ -97,12 +99,21 @@ export default function SettingsPage() {
   }, [userCurrent]);
 
   const handleLogOut = async () => {
+    setIsLoggingOut(true);
     try {
       const { CometChatUIKit } = await import("@cometchat/chat-uikit-react");
-      await CometChatUIKit.logout();
-      router.push("/login");
+      await CometChatUIKit.logout().catch((e: any) =>
+        console.error("CometChat logout failed:", e),
+      );
+    } catch (e) {
+      console.error("CometChat import failed:", e);
+    }
+    try {
+      await ClickLogout();
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout API failed:", error);
+    } finally {
+      setIsLoggingOut(false);
       router.push("/login");
     }
   };
@@ -1090,10 +1101,15 @@ export default function SettingsPage() {
 
                 <button
                   onClick={handleLogOut}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                  disabled={isLoggingOut}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-destructive hover:bg-destructive/10 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <LogOut size={20} />
-                  Log out
+                  {isLoggingOut ? (
+                    <Loader2 size={20} className="animate-spin" />
+                  ) : (
+                    <LogOut size={20} />
+                  )}
+                  {isLoggingOut ? "Logging out..." : "Log out"}
                 </button>
               </nav>
             </div>

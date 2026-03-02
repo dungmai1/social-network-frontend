@@ -42,11 +42,7 @@ export default function LoginForm() {
         setIsLoading(false);
         return;
       }
-
-      // Redirect to intended page or home
-      const intendedPath = searchParams.get("from") || "/";
-      router.push(intendedPath);
-      // Keep isLoading true during redirect
+      router.push("/")
     } catch (e: any) {
       setError(e.message || "An error occurred, please try again");
       setIsLoading(false);

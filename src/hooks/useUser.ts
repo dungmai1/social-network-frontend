@@ -16,7 +16,7 @@ export default function useUser() {
     fetchData();
   }, []);
 
-  const handleLogout = async () => {
+  const ClickLogout = async () => {
     await logout();
   };
 
@@ -28,5 +28,5 @@ export default function useUser() {
       console.log("Error get user by user name");
     }
   };
-  return { userCurrent, handleLogout, getUserInfo, userInfo };
+  return { userCurrent, ClickLogout, getUserInfo, userInfo };
 }
