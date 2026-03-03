@@ -24,7 +24,7 @@ import useUser from "@/hooks/useUser";
 export default function Header() {
   const router = useRouter();
   const { ClickLogout } = useUser();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { userCurrent } = useUser();
   const [unreadCount, setUnreadCount] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -88,8 +88,7 @@ export default function Header() {
   }, []);
 
   const ThemeIcon = () => {
-    if (theme === "system") return <Monitor size={18} />;
-    if (resolvedTheme === "dark") return <Moon size={18} />;
+    if (theme === "dark") return <Moon size={18} />;
     return <Sun size={18} />;
   };
 

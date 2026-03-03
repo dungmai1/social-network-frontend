@@ -25,7 +25,7 @@ import Header from "@/components/layout/Header";
 
 export default function Home() {
   const { allPostsQuery, savePostMutation } = usePost();
-  const { userCurrent } = useUser();
+  const { userCurrent, isLoadingUser } = useUser();
   const {
     data: allPostsPages,
     isLoading: isAllLoading,
@@ -47,7 +47,7 @@ export default function Home() {
     () => ({
       data: allPostsPages?.pages?.flatMap((page) => page?.data ?? []) ?? [],
     }),
-    [allPostsPages]
+    [allPostsPages],
   );
   const triggerRef = useRef(null);
 
@@ -64,7 +64,7 @@ export default function Home() {
         console.error("Failed to save post", error);
       }
     },
-    [savePostMutation]
+    [savePostMutation],
   );
 
   useIntersectionObserver({
@@ -73,6 +73,45 @@ export default function Home() {
     enabled: !!hasNextPage,
     threshold: 0,
   });
+
+  if (isLoadingUser || isAllLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-lg font-semibold text-foreground">
+              Loading your feed
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Please wait a moment...
+            </p>
+          </div>
+        </div>
+        <div className="w-full max-w-[520px] px-4 space-y-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="glass-card rounded-2xl p-4 animate-pulse">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-muted" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-3 w-28 bg-muted rounded-full" />
+                  <div className="h-2 w-20 bg-muted/50 rounded-full" />
+                </div>
+              </div>
+              <div className="aspect-square bg-muted/50 rounded-xl mb-4" />
+              <div className="space-y-2">
+                <div className="h-3 w-full bg-muted rounded-full" />
+                <div className="h-3 w-2/3 bg-muted/50 rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -292,7 +331,7 @@ export default function Home() {
                   <ul className="space-y-1">
                     {listRecommend.map((suggestion) => {
                       const isFollowed = followedUsers.includes(
-                        suggestion.username
+                        suggestion.username,
                       );
                       return (
                         <li
@@ -468,7 +507,11 @@ function SidebarItem({
     >
       {avatar ? (
         <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-primary/30">
-          <img className="w-full h-full object-cover" src={avatar} alt={label} />
+          <img
+            className="w-full h-full object-cover"
+            src={avatar}
+            alt={label}
+          />
         </div>
       ) : (
         <span className={active ? "text-primary" : "text-muted-foreground"}>

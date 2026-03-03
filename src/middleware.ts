@@ -1,30 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 const publicRoutes = ["/login", "/register"];
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get("accessToken");
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   if (
     path.startsWith("/_next") ||
     path.startsWith("/api") ||
-    path.includes(".") // static files like .svg, .png, etc.
+    path.includes(".")
   ) {
     return NextResponse.next();
   }
 
   const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
-  const isAuthenticated = !!token;
+  try {
+    const cookieHeader = request.headers.get("cookie") || "";
+    const response = await fetch(`${API_BASE_URL}/api/me`, {
+      method: "GET",
+      headers: {
+        cookie: cookieHeader,
+      },
+    });
 
-  if (isAuthenticated && isPublicRoute) {
-    return NextResponse.redirect(new URL("/", request.nextUrl));
+    const isAuthenticated = response.status === 200;
+    console.log(isAuthenticated);
+    if (isAuthenticated && isPublicRoute) {
+      return NextResponse.redirect(new URL("/", request.nextUrl));
+    }
+
+    if (!isAuthenticated && !isPublicRoute) {
+      return NextResponse.redirect(new URL("/login", request.nextUrl));
+    }
+    
+    return NextResponse.next();
+  } catch (error) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
-
-  // if (!isAuthenticated && !isPublicRoute) {
-  //   return NextResponse.redirect(new URL("/login", request.nextUrl));
-  // }
-
-  return NextResponse.next();
 }
 
 export const config = {

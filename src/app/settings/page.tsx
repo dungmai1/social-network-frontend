@@ -38,15 +38,13 @@ type SettingsTab = "account" | "security" | "appearance" | "language" | "help";
 export default function SettingsPage() {
   const router = useRouter();
   const { ClickLogout } = useUser();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { userCurrent } = useUser();
   const [activeTab, setActiveTab] = useState<SettingsTab>("account");
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [previewTheme, setPreviewTheme] = useState<"light" | "dark" | "system">(
-    theme,
-  );
+  const [previewTheme, setPreviewTheme] = useState<"light" | "dark">(theme);
 
   // Change password states
   const [passwordForm, setPasswordForm] = useState({
@@ -663,9 +661,7 @@ export default function SettingsPage() {
         );
 
       case "appearance": {
-        const isDarkPreview =
-          previewTheme === "dark" ||
-          (previewTheme === "system" && resolvedTheme === "dark");
+        const isDarkPreview = previewTheme === "dark";
         const hasChanges = previewTheme !== theme;
         return (
           <div className="space-y-8">
@@ -681,7 +677,7 @@ export default function SettingsPage() {
             {/* Theme Selection */}
             <div className="glass-card rounded-xl p-5">
               <h3 className="font-medium text-foreground mb-4">Theme</h3>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { id: "light", label: "Light", icon: Sun },
                   { id: "dark", label: "Dark", icon: Moon },

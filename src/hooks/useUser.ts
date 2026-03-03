@@ -6,12 +6,15 @@ import { useEffect, useState } from "react";
 export default function useUser() {
   const [userCurrent, setUserCurrent] = useState<UserModel | null>(null);
   const [userInfo, setUserInfo] = useState<UserProfileModel | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoadingUser(true);
       const data = await getUser();
       if (data) {
         setUserCurrent(data);
       }
+      setIsLoadingUser(false);
     };
     fetchData();
   }, []);
@@ -28,5 +31,5 @@ export default function useUser() {
       console.log("Error get user by user name");
     }
   };
-  return { userCurrent, ClickLogout, getUserInfo, userInfo };
+  return { userCurrent, isLoadingUser, ClickLogout, getUserInfo, userInfo };
 }
