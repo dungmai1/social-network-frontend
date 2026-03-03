@@ -42,7 +42,7 @@ export default function LoginForm() {
         setIsLoading(false);
         return;
       }
-      router.push("/")
+      router.push("/");
     } catch (e: any) {
       setError(e.message || "An error occurred, please try again");
       setIsLoading(false);
@@ -63,9 +63,14 @@ export default function LoginForm() {
           <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
             Welcome back
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-sm mb-4">
             Sign in to continue to your community
           </p>
+          <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg text-sm flex flex-col items-center text-foreground">
+            <span className="font-semibold mb-1">Demo Account:</span>
+            <span className="font-mono">username: dungmai1</span>
+            <span className="font-mono">password: dungmai1</span>
+          </div>
         </div>
 
         {/* Form */}
