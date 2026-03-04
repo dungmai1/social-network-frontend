@@ -66,7 +66,7 @@ export default function ProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = React.use(params);
-  const { getUserInfo, userInfo } = useUser();
+  const { getUserInfo, userInfo, isLoadingUserInfo } = useUser();
   const { handleAddFollow, followersList, followingsList } =
     useRelationship(username);
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
@@ -151,148 +151,185 @@ export default function ProfilePage({
 
         {/* Profile Info */}
         <div className="relative -mt-16 sm:-mt-20 pb-6">
-          <div className="flex flex-col sm:flex-row gap-6">
-            {/* Avatar */}
-            <div className="flex justify-center sm:justify-start">
-              <div className="relative">
-                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden ring-4 ring-background shadow-xl">
-                  <img
-                    src={
-                      userInfo?.avatar ||
-                      "https://picsum.photos/seed/avatar/400/400"
-                    }
-                    alt={userInfo?.username || "Profile"}
-                    className="w-full h-full object-cover"
-                  />
+          {isLoadingUserInfo ? (
+            <>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex justify-center sm:justify-start">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-muted/60 animate-pulse ring-4 ring-background shadow-xl" />
+                </div>
+                <div className="flex-1 text-center sm:text-left sm:pt-20 space-y-3">
+                  <div className="h-8 w-40 bg-muted/60 animate-pulse rounded-lg mx-auto sm:mx-0" />
+                  <div className="h-4 w-64 bg-muted/60 animate-pulse rounded-lg mx-auto sm:mx-0" />
+                  <div className="h-4 w-48 bg-muted/60 animate-pulse rounded-lg mx-auto sm:mx-0" />
+                  <div className="flex gap-2 justify-center sm:justify-start pt-1">
+                    <div className="h-9 w-24 bg-muted/60 animate-pulse rounded-xl" />
+                    <div className="h-9 w-9 bg-muted/60 animate-pulse rounded-xl" />
+                  </div>
                 </div>
               </div>
-            </div>
+              <div className="flex justify-center sm:justify-start gap-8 mt-6 pt-6 border-t border-border">
+                {["Posts", "Followers", "Following"].map((label) => (
+                  <div key={label} className="text-center space-y-1">
+                    <div className="h-7 w-12 bg-muted/60 animate-pulse rounded-lg mx-auto" />
+                    <p className="text-sm text-muted-foreground">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex justify-center sm:justify-start">
+                  <div className="relative">
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden ring-4 ring-background shadow-xl">
+                      <img
+                        src={
+                          userInfo?.avatar ||
+                          "https://picsum.photos/seed/avatar/400/400"
+                        }
+                        alt={userInfo?.username || "Profile"}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1 text-center sm:text-left sm:pt-20">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-heading">
+                      {userInfo?.username || "username"}
+                    </h1>
+                    {userInfo?.relationship.following && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                        <UserCheck size={12} />
+                        Following
+                      </span>
+                    )}
+                  </div>
 
-            {/* Info */}
-            <div className="flex-1 text-center sm:text-left sm:pt-20">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-heading">
-                  {userInfo?.username || "username"}
-                </h1>
-                {userInfo?.relationship.following && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                    <UserCheck size={12} />
-                    Following
-                  </span>
-                )}
+                  {/* Bio */}
+                  <p className="text-muted-foreground mb-4 max-w-md">
+                    {userInfo?.description || "No bio yet"}
+                  </p>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                    {userInfo?.relationship.self ? (
+                      <>
+                        <button
+                          onClick={() => setShowShareDialog(true)}
+                          className="px-5 py-2 bg-muted hover:bg-accent text-foreground font-medium text-sm rounded-xl transition-colors cursor-pointer"
+                        >
+                          <Share2 size={16} className="inline mr-2" />
+                          Share
+                        </button>
+                        <Link href="/settings">
+                          <button className="p-2 bg-muted hover:bg-accent text-foreground rounded-xl transition-colors cursor-pointer">
+                            <Settings size={18} />
+                          </button>
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() =>
+                            handleAddFollow().then(() => getUserInfo(username))
+                          }
+                          className={`px-6 py-2 font-semibold text-sm rounded-xl transition-all cursor-pointer ${
+                            userInfo?.relationship.following
+                              ? "bg-muted hover:bg-accent text-foreground"
+                              : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                          }`}
+                        >
+                          {userInfo?.relationship.following ? (
+                            <>
+                              <UserCheck size={16} className="inline mr-2" />
+                              Following
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus size={16} className="inline mr-2" />
+                              Follow
+                            </>
+                          )}
+                        </button>
+                        <Link href={`/message/${username}`}>
+                          <button className="px-5 py-2 bg-muted hover:bg-accent text-foreground font-medium text-sm rounded-xl transition-colors cursor-pointer">
+                            <Mail size={16} className="inline mr-2" />
+                            Message
+                          </button>
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* Bio */}
-              <p className="text-muted-foreground mb-4 max-w-md">
-                {userInfo?.description || "No bio yet"}
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                {userInfo?.relationship.self ? (
-                  <>
-                    <button
-                      onClick={() => setShowShareDialog(true)}
-                      className="px-5 py-2 bg-muted hover:bg-accent text-foreground font-medium text-sm rounded-xl transition-colors cursor-pointer"
-                    >
-                      <Share2 size={16} className="inline mr-2" />
-                      Share
-                    </button>
-                    <Link href="/settings">
-                      <button className="p-2 bg-muted hover:bg-accent text-foreground rounded-xl transition-colors cursor-pointer">
-                        <Settings size={18} />
-                      </button>
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() =>
-                        handleAddFollow().then(() => getUserInfo(username))
-                      }
-                      className={`px-6 py-2 font-semibold text-sm rounded-xl transition-all cursor-pointer ${
-                        userInfo?.relationship.following
-                          ? "bg-muted hover:bg-accent text-foreground"
-                          : "bg-primary hover:bg-primary/90 text-primary-foreground"
-                      }`}
-                    >
-                      {userInfo?.relationship.following ? (
-                        <>
-                          <UserCheck size={16} className="inline mr-2" />
-                          Following
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus size={16} className="inline mr-2" />
-                          Follow
-                        </>
-                      )}
-                    </button>
-                    <Link href={`/message/${username}`}>
-                      <button className="px-5 py-2 bg-muted hover:bg-accent text-foreground font-medium text-sm rounded-xl transition-colors cursor-pointer">
-                        <Mail size={16} className="inline mr-2" />
-                        Message
-                      </button>
-                    </Link>
-                  </>
-                )}
+              {/* Stats */}
+              <div className="flex justify-center sm:justify-start gap-8 mt-6 pt-6 border-t border-border">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-foreground">
+                    {stats.posts}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Posts</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowFollowersDialog(true)}
+                  className="text-center hover:opacity-80 transition-opacity cursor-pointer"
+                >
+                  <p className="text-2xl font-bold text-foreground">
+                    {stats.followers.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Followers</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowFollowingsDialog(true)}
+                  className="text-center hover:opacity-80 transition-opacity cursor-pointer"
+                >
+                  <p className="text-2xl font-bold text-foreground">
+                    {stats.following.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Following</p>
+                </button>
               </div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="flex justify-center sm:justify-start gap-8 mt-6 pt-6 border-t border-border">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-foreground">
-                {stats.posts}
-              </p>
-              <p className="text-sm text-muted-foreground">Posts</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowFollowersDialog(true)}
-              className="text-center hover:opacity-80 transition-opacity cursor-pointer"
-            >
-              <p className="text-2xl font-bold text-foreground">
-                {stats.followers.toLocaleString()}
-              </p>
-              <p className="text-sm text-muted-foreground">Followers</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowFollowingsDialog(true)}
-              className="text-center hover:opacity-80 transition-opacity cursor-pointer"
-            >
-              <p className="text-2xl font-bold text-foreground">
-                {stats.following.toLocaleString()}
-              </p>
-              <p className="text-sm text-muted-foreground">Following</p>
-            </button>
-          </div>
+            </>
+          )}
         </div>
 
         {/* Navigation Tabs */}
         <div className="border-t border-border">
           <div className="flex justify-center">
-            <nav className="flex">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-6 sm:px-8 py-4 text-sm font-medium border-t-2 -mt-px transition-colors cursor-pointer ${
-                      activeTab === tab.id
-                        ? "border-primary text-primary"
-                        : "border-transparent text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <Icon size={18} />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+            {isLoadingUserInfo ? (
+              <div className="flex gap-2 py-3">
+                {[...Array(2)].map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="h-10 w-24 bg-muted/60 animate-pulse rounded-lg"
+                  />
+                ))}
+              </div>
+            ) : (
+              <nav className="flex">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2 px-6 sm:px-8 py-4 text-sm font-medium border-t-2 -mt-px transition-colors cursor-pointer ${
+                        activeTab === tab.id
+                          ? "border-primary text-primary"
+                          : "border-transparent text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Icon size={18} />
+                      <span className="hidden sm:inline">{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            )}
           </div>
         </div>
 

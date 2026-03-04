@@ -37,7 +37,7 @@ type SettingsTab = "account" | "security" | "appearance" | "language" | "help";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { ClickLogout } = useUser();
+  const { ClickLogout, isLoadingUser, refreshUser } = useUser();
   const { theme, setTheme } = useTheme();
   const { userCurrent } = useUser();
   const [activeTab, setActiveTab] = useState<SettingsTab>("account");
@@ -186,13 +186,10 @@ export default function SettingsPage() {
         setProfileLoading(false);
         return;
       }
-
       await updateUser(formData);
       setProfileSuccess("Profile updated successfully!");
-
-      // Reset avatar file after successful update
+      await refreshUser();
       setAvatarFile(null);
-      setAvatarPreview(null);
     } catch (error: any) {
       setProfileErrors({
         general: error.message || "Failed to update profile",
@@ -272,6 +269,51 @@ export default function SettingsPage() {
   const renderContent = () => {
     switch (activeTab) {
       case "account":
+        if (isLoadingUser) {
+          return (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-2">
+                  Account Settings
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Manage your account information and profile details.
+                </p>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="w-24 h-24 rounded-full bg-muted/60 animate-pulse ring-4 ring-primary/20" />
+                <div className="space-y-2">
+                  <div className="h-5 w-32 bg-muted/60 animate-pulse rounded-lg" />
+                  <div className="h-4 w-44 bg-muted/60 animate-pulse rounded-lg" />
+                </div>
+              </div>
+              <div className="grid gap-6">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {["Username", "Display Name"].map((label) => (
+                    <div key={label}>
+                      <div className="h-4 w-24 bg-muted/60 animate-pulse rounded mb-2" />
+                      <div className="h-12 w-full bg-muted/60 animate-pulse rounded-xl" />
+                    </div>
+                  ))}
+                </div>
+                {["Email", "Phone Number"].map((label) => (
+                  <div key={label}>
+                    <div className="h-4 w-20 bg-muted/60 animate-pulse rounded mb-2" />
+                    <div className="h-12 w-full bg-muted/60 animate-pulse rounded-xl" />
+                  </div>
+                ))}
+                <div>
+                  <div className="h-4 w-12 bg-muted/60 animate-pulse rounded mb-2" />
+                  <div className="h-28 w-full bg-muted/60 animate-pulse rounded-xl" />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <div className="h-10 w-32 bg-muted/60 animate-pulse rounded-xl" />
+              </div>
+            </div>
+          );
+        }
+
         return (
           <div className="space-y-8">
             <div>
